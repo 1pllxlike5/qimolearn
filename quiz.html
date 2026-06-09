@@ -1425,8 +1425,8 @@ function setMode(m) {
   document.getElementById('resultPanel').classList.remove('show');
   document.getElementById('quizBar').classList.add('hidden');
 
-  if (m === 'practice') { document.getElementById('panelPractice').classList.remove('hidden'); renderQ(); }
-    else if (m === 'wrong') { document.getElementById('panelPractice').classList.remove('hidden'); renderQ(); }
+  if (m === 'practice') { state.curIdx = 0; document.getElementById('panelPractice').classList.remove('hidden'); renderQ(); }
+    else if (m === 'wrong') { state.curIdx = 0; document.getElementById('panelPractice').classList.remove('hidden'); renderQ(); }
   else if (m === 'quiz') { startQuiz(); }
   else if (m === 'review') { document.getElementById('panelReview').classList.remove('hidden'); renderReview(); }
   else if (m === 'nav') { document.getElementById('panelNav').classList.remove('hidden'); renderNav(); }
