@@ -1,6 +1,10 @@
-# 忽略原始图片（已内嵌到 HTML 中）
+# 忽略不需要的图片（但保留需要的4张）
 *.jpg
 *.jpg.b64
+!7adf4b91e0bb47044fcfcfd084673209.jpg
+!7e737bfc9b122b5fe2bb12bd090623c9.jpg
+!af3a4711726466fb737a31e5af218583.jpg
+!db0d8116f116f331d32646467101eef7.jpg
 
 # Python
 __pycache__/

@@ -87,21 +87,7 @@
 
 
 
-/* ===== 原图折叠 ===== */
-  .q-image-collapse { margin-bottom: 6px; }
-  .img-toggle {
-    display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
-    border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;
-    cursor: pointer; font-size: 11px; color: #888; transition: all 0.2s;
-  }
-  .img-toggle:hover { background: #eee; color: #555; }
-  .img-toggle.open { background: #eef0ff; border-color: #667eea; color: #667eea; }
-  .q-image-wrap { border-radius: 8px; overflow: hidden; background: #fafafa; border: 1px solid #eee; margin-top: 4px; }
-  .q-image-wrap img { width: 100%; height: auto; display: block; cursor: zoom-in; }
-  .q-image-wrap img.zoomed { cursor: zoom-out; transform: scale(1.8); transform-origin: top left; }
-  .zoom-hint { text-align: center; font-size: 11px; color: #999; padding: 3px; background: #fafafa; border-top: 1px solid #eee; }
-
-  /* ===== 题目文字 ===== */
+/* ===== 题目文字 ===== */
   .q-text {
     font-size: 15px; line-height: 1.7; margin-bottom: 12px;
     padding: 10px 14px; background: #f8f9ff; border-radius: 8px;
@@ -311,13 +297,7 @@
         <span class="q-type" id="qTypeLabel"></span>
         <button class="bm-btn" id="bmBtn" onclick="toggleBookmark()" title="收藏此题">☆</button>
       </div>
-      <!-- 原图折叠 -->
-      <div class="q-image-collapse">
-        <button class="img-toggle" onclick="toggleImg()">📷 查看原图</button>
-        <div class="q-image-wrap hidden" id="qImgWrap">
-          <img id="qImg" src="" alt="原题图片" onclick="toggleZoom(this)">
-          <div class="zoom-hint">👆 点击放大</div>
-        </div>
+      
       </div>
       <!-- 题目文字 -->
       <div class="q-text" id="qText"></div>
@@ -1455,7 +1435,7 @@ function renderQ() {
   const filtered = getFiltered();
   if (filtered.length === 0 && state.mode === 'wrong') { document.getElementById('qNum').textContent = '🎉 错题已全部消灭！'; document.getElementById('qTypeLabel').textContent=''; document.getElementById('qText').innerHTML='太棒了！你已经把所有错题都做对了。<br>点击 <b>答题卡</b> 查看全部题目，或切换到 <b>刷题</b> 模式继续练习。'; hideAll(); return; }
   // 折叠原图
-  document.getElementById('qImgWrap').classList.add('hidden');
+  
   const imgBtn = document.querySelector('.img-toggle');
   imgBtn.classList.remove('open'); imgBtn.textContent = '📷 查看原图';
 
@@ -1473,7 +1453,7 @@ function renderQ() {
   else if (q.type==='essay') tl.classList.add('essay');
 
   // 图片
-  document.getElementById('qImg').src = q.img;
+  
 
   // 题目文字
   const qt = document.getElementById('qText');
@@ -1697,17 +1677,10 @@ function restoreAns(q) {
 }
 
 // ==================== 图片 ====================
-function toggleImg() {
-  const w = document.getElementById('qImgWrap');
-  const b = document.querySelector('.img-toggle');
-  w.classList.toggle('hidden');
-  b.classList.toggle('open');
-  b.textContent = w.classList.contains('hidden')?'📷 查看原图':'📷 收起原图';
-}
 
 
 function hideAll() {
-  document.getElementById('qImgWrap').classList.add('hidden');
+  
   document.getElementById('optArea').classList.add('hidden');
   document.getElementById('tfArea').classList.add('hidden');
   document.getElementById('inpArea').classList.add('hidden');
@@ -1732,8 +1705,6 @@ function renderBMbtn(q) {
   b.textContent = state.bookmarked.has(q.id) ? '★' : '☆';
   b.className = 'bm-btn' + (state.bookmarked.has(q.id)?' on':'');
 }
-
-function toggleZoom(img) { img.classList.toggle('zoomed'); }
 
 // ==================== 统计 ====================
 function updateStats() {
