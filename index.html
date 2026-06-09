@@ -84,6 +84,49 @@
   .bm-btn:hover { transform: scale(1.2); color: #f5a623; }
   .bm-btn.on { color: #f5a623; }
 
+
+/* ===== 前置公告弹窗 ===== */
+.splash-overlay {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 16px;
+}
+.splash-overlay.show { display: flex; }
+.splash-card {
+  background: #fff; border-radius: 16px; max-width: 480px; width: 100%;
+  max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: splashIn 0.3s ease;
+}
+@keyframes splashIn {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.splash-head {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff; padding: 24px 24px 20px; border-radius: 16px 16px 0 0;
+  text-align: center;
+}
+.splash-head h2 { font-size: 22px; margin-bottom: 4px; }
+.splash-head p { font-size: 13px; opacity: 0.85; }
+.splash-body { padding: 16px 20px 20px; }
+.cl-item {
+  padding: 10px 0; border-bottom: 1px solid #eee;
+}
+.cl-item:last-child { border-bottom: none; }
+.cl-current { background: #f8f9ff; margin: 0 -12px; padding: 10px 12px; border-radius: 8px; }
+.cl-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.cl-ver {
+  font-weight: 700; font-size: 13px; color: #667eea;
+  background: #eef0ff; padding: 1px 8px; border-radius: 4px;
+}
+.cl-current .cl-ver { background: #667eea; color: #fff; }
+.cl-title { font-weight: 600; font-size: 14px; flex: 1; }
+.cl-date { font-size: 11px; color: #999; }
+.cl-items { margin: 0; padding-left: 18px; }
+.cl-items li { font-size: 13px; color: #555; line-height: 1.7; }
+.splash-foot { padding: 0 20px 20px; text-align: center; }
+.splash-foot .btn { width: 100%; padding: 12px; font-size: 16px; }
+
 /* ===== 原图折叠 ===== */
   .q-image-collapse { margin-bottom: 6px; }
   .img-toggle {
@@ -259,6 +302,19 @@
 </head>
 <body>
 <div class="container" id="app">
+  <!-- ===== 前置公告弹窗 ===== -->
+  <div class="splash-overlay" id="splashOverlay">
+    <div class="splash-card">
+      <div class="splash-head">
+        <h2>📢 更新公告</h2>
+        <p>前端期末复习刷题 · v<span id="splashVer">2.0</span></p>
+      </div>
+      <div class="splash-body" id="changelogList"></div>
+      <div class="splash-foot">
+        <button class="btn btn-primary" onclick="dismissSplash()">🚀 开始答题</button>
+      </div>
+    </div>
+  </div>
   <!-- 头部 -->
   <div class="header">
     <div class="header-top">
@@ -1380,6 +1436,59 @@ let state = {
   quizIdx: 0,
 };
 
+// ==================== 版本与公告 ====================
+const APP_VERSION = '2.0';
+const CHANGELOG = [
+  {ver:'2.0', title:'收藏、错题集、题库修正', date:'2026-06-09',
+   items:[
+     '⭐ 收藏功能：点击星星收藏题目，进入收藏夹单独刷',
+     '📕 错题集：答错的题自动收录，可重做直到消灭',
+     '🔄 重新答题：一键清除所有记录从头开始',
+     '💾 数据持久化：刷新或关页面不丢答题记录',
+     '📝 题库修正：对照原始文档逐题核对，更新至87题',
+   ]},
+  {ver:'1.0', title:'初始版本', date:'2026-06-09',
+   items:[
+     '📚 60道前端期末试题（选择题+判断题+填空题+计算题）',
+     '📝 三种模式：刷题、测验、阅读',
+     '🔍 题型筛选与答题卡导航',
+     '🌐 支持局域网和公网分享',
+   ]},
+];
+
+function checkVersion() {
+  try {
+    const lastVer = localStorage.getItem('qa_version') || '';
+    if (lastVer !== APP_VERSION) {
+      document.getElementById('splashOverlay').classList.add('show');
+      renderChangelog();
+    }
+  } catch(e) {}
+}
+
+function renderChangelog() {
+  const list = document.getElementById('changelogList');
+  if (!list) return;
+  list.innerHTML = '';
+  CHANGELOG.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'cl-item' + (c.ver === APP_VERSION ? ' cl-current' : '');
+    let html = '<div class="cl-header"><span class="cl-ver">v' + c.ver + '</span>';
+    html += '<span class="cl-title">' + c.title + '</span>';
+    html += '<span class="cl-date">' + c.date + '</span></div>';
+    html += '<ul class="cl-items">';
+    c.items.forEach(item => { html += '<li>' + item + '</li>'; });
+    html += '</ul>';
+    div.innerHTML = html;
+    list.appendChild(div);
+  });
+}
+
+function dismissSplash() {
+  document.getElementById('splashOverlay').classList.remove('show');
+  try { localStorage.setItem('qa_version', APP_VERSION); } catch(e) {}
+}
+
 // ==================== 工具函数 ====================
 function getFiltered() {
   let qs = QUESTIONS;
@@ -1933,6 +2042,7 @@ function resetQuiz() {
 
 // ==================== 初始化 ====================
 loadState();
+checkVersion();
 updateStats();
 renderQ();
 </script>
