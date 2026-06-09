@@ -75,7 +75,16 @@
   .q-type.code { background: #fce4ec; color: #c62828; }
   .q-type.essay { background: #f3e5f5; color: #7b1fa2; }
 
-  /* ===== 原图折叠 ===== */
+  
+  .bm-btn {
+    background: none; border: none; font-size: 22px; cursor: pointer;
+    color: #ccc; transition: all 0.2s; padding: 2px 6px; line-height: 1;
+    margin-left: auto;
+  }
+  .bm-btn:hover { transform: scale(1.2); color: #f5a623; }
+  .bm-btn.on { color: #f5a623; }
+
+/* ===== 原图折叠 ===== */
   .q-image-collapse { margin-bottom: 6px; }
   .img-toggle {
     display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
@@ -268,7 +277,9 @@
     <button class="tab active" data-mode="practice" onclick="setMode('practice')">📝 刷题</button>
     <button class="tab" data-mode="quiz" onclick="setMode('quiz')">📋 测验</button>
     <button class="tab" data-mode="review" onclick="setMode('review')">📖 阅读</button>
-    <button class="tab" data-mode="nav" onclick="setMode('nav')">🗂️ 答题卡 <span class="badge" id="wrongBadge">0</span></button>
+    <button class="tab" data-mode="wrong" onclick="setMode('wrong')">📕 错题集 <span class="badge" id="wrongBadge">0</span></button>
+    <button class="tab" data-mode="nav" onclick="setMode('nav')">🗂️ 答题卡</button>
+    <button class="tab" onclick="resetQuiz()">🔄 重来</button>
   </div>
 
   <!-- 题型筛选 -->
@@ -278,6 +289,7 @@
     <span class="filter-chip" data-filter="truefalse" onclick="setFilter('truefalse')">判断题</span>
     <span class="filter-chip" data-filter="fill" onclick="setFilter('fill')">填空题</span>
     <span class="filter-chip" data-filter="code" onclick="setFilter('code')">编程题</span>
+    <span class="filter-chip" data-filter="star" onclick="setFilter('star')">⭐ 收藏</span>
   </div>
 
   <!-- 测验栏（仅测验模式显示） -->
@@ -293,6 +305,7 @@
       <div class="q-header">
         <span class="q-number" id="qNum"></span>
         <span class="q-type" id="qTypeLabel"></span>
+        <button class="bm-btn" id="bmBtn" onclick="toggleBookmark()" title="收藏此题">☆</button>
       </div>
       <!-- 原图折叠 -->
       <div class="q-image-collapse">
@@ -1356,6 +1369,7 @@ let state = {
   answered: new Set(),
   wrong: new Set(),
   submitted: false,
+  bookmarked: new Set(),
 
   // quiz mode
   quizActive: false,
@@ -1368,7 +1382,14 @@ let state = {
 
 // ==================== 工具函数 ====================
 function getFiltered() {
-  return QUESTIONS.filter(q => state.filter === 'all' || q.type === state.filter);
+  let qs = QUESTIONS;
+  // 错题集模式只显示错题
+  if (state.mode === 'wrong') qs = qs.filter(q => state.wrong.has(q.id));
+  // 题型筛选
+  if (state.filter !== 'all' && state.filter !== 'star') qs = qs.filter(q => q.type === state.filter);
+  // 收藏筛选
+  if (state.filter === 'star') qs = qs.filter(q => state.bookmarked.has(q.id));
+  return qs;
 }
 
 function getCur() { return getFiltered()[state.curIdx]; }
@@ -1382,6 +1403,19 @@ function setMode(m) {
     endQuiz();
   }
   state.mode = m;
+  if (m === 'wrong' && state.wrong.size === 0) {
+    document.getElementById('panelPractice').classList.remove('hidden');
+    document.querySelectorAll('#modeTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.mode === m));
+    document.getElementById('panelReview').classList.add('hidden');
+    document.getElementById('panelNav').classList.add('hidden');
+    document.getElementById('resultPanel').classList.remove('show');
+    document.getElementById('quizBar').classList.add('hidden');
+    document.getElementById('qNum').textContent = '🎉 暂无错题';
+    document.getElementById('qTypeLabel').textContent = '';
+    document.getElementById('qText').innerHTML = '恭喜！你还没有做错过题目，继续保持！<br>切换到 <b>刷题</b> 模式继续练习。';
+    hideAll();
+    return;
+  }
   document.querySelectorAll('#modeTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.mode === m));
   document.getElementById('panelPractice').classList.add('hidden');
   document.getElementById('panelReview').classList.add('hidden');
@@ -1390,6 +1424,7 @@ function setMode(m) {
   document.getElementById('quizBar').classList.add('hidden');
 
   if (m === 'practice') { document.getElementById('panelPractice').classList.remove('hidden'); renderQ(); }
+    else if (m === 'wrong') { document.getElementById('panelPractice').classList.remove('hidden'); renderQ(); }
   else if (m === 'quiz') { startQuiz(); }
   else if (m === 'review') { document.getElementById('panelReview').classList.remove('hidden'); renderReview(); }
   else if (m === 'nav') { document.getElementById('panelNav').classList.remove('hidden'); renderNav(); }
@@ -1397,10 +1432,12 @@ function setMode(m) {
 
 function setFilter(f) {
   state.filter = f;
+  state.filter = f;
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
   // Update counts
   const total = QUESTIONS.length;
   document.querySelector('.filter-chip[data-filter="all"]').textContent = `全部 (${total})`;
+  document.querySelector('.filter-chip[data-filter="star"]').textContent = `⭐ 收藏 (${state.bookmarked.size})`;
   ['choice','truefalse','fill','code'].forEach(t => {
     const count = QUESTIONS.filter(q => q.type === t).length;
     const el = document.querySelector(`.filter-chip[data-filter="${t}"]`);
@@ -1415,6 +1452,8 @@ function renderQ() {
   if (!q) { document.getElementById('qNum').textContent = '无题目'; return; }
 
   state.submitted = false;
+  const filtered = getFiltered();
+  if (filtered.length === 0 && state.mode === 'wrong') { document.getElementById('qNum').textContent = '🎉 错题已全部消灭！'; document.getElementById('qTypeLabel').textContent=''; document.getElementById('qText').innerHTML='太棒了！你已经把所有错题都做对了。<br>点击 <b>答题卡</b> 查看全部题目，或切换到 <b>刷题</b> 模式继续练习。'; hideAll(); return; }
   // 折叠原图
   document.getElementById('qImgWrap').classList.add('hidden');
   const imgBtn = document.querySelector('.img-toggle');
@@ -1455,7 +1494,7 @@ function renderQ() {
   document.getElementById('btnSkip').classList.add('hidden');
 
   // 跳过按钮仅在测验模式显示
-  if (state.mode === 'quiz') document.getElementById('btnSkip').classList.remove('hidden');
+  if (state.mode === 'quiz' && state.mode !== 'wrong') document.getElementById('btnSkip').classList.remove('hidden');
 
   // 渲染答案区
   if (q.type === 'choice') renderChoice(q);
@@ -1464,8 +1503,10 @@ function renderQ() {
 
   // 如果已经答过，恢复
   if (state.answered.has(q.id)) restoreAns(q);
+  renderBMbtn(q);
 
   updateStats();
+  saveState();
 }
 
 function renderChoice(q) {
@@ -1572,7 +1613,17 @@ function submitAns() {
 
   fb.innerHTML += '<div class="detail">💡 ' + q.exp + '</div>';
   updateStats();
+  saveState();
   document.getElementById('btnShowAns').classList.toggle('hidden', ok);
+  // 错题集模式下答对自动移除
+  if (ok && state.mode === 'wrong' && state.wrong.has(q.id)) {
+    state.wrong.delete(q.id);
+    setTimeout(() => {
+      const fl = getFiltered();
+      if (fl.length === 0) renderQ();
+      else nextQ();
+    }, 1000);
+  }
 }
 
 function getRightText(q) {
@@ -1653,6 +1704,35 @@ function toggleImg() {
   b.classList.toggle('open');
   b.textContent = w.classList.contains('hidden')?'📷 查看原图':'📷 收起原图';
 }
+
+
+function hideAll() {
+  document.getElementById('qImgWrap').classList.add('hidden');
+  document.getElementById('optArea').classList.add('hidden');
+  document.getElementById('tfArea').classList.add('hidden');
+  document.getElementById('inpArea').classList.add('hidden');
+  document.getElementById('fb').className='feedback'; document.getElementById('fb').style.display='none';
+  document.getElementById('btnSubmit').classList.add('hidden');
+  document.getElementById('btnNext').classList.add('hidden');
+  document.getElementById('btnShowAns').classList.add('hidden');
+  document.getElementById('btnSkip').classList.add('hidden');
+}
+
+function toggleBookmark() {
+  const q = getCur(); if (!q) return;
+  if (state.bookmarked.has(q.id)) state.bookmarked.delete(q.id); else state.bookmarked.add(q.id);
+  renderBMbtn(q);
+  saveState();
+  updateStats();
+  saveState();
+}
+function renderBMbtn(q) {
+  const b = document.getElementById('bmBtn');
+  if (!b) return;
+  b.textContent = state.bookmarked.has(q.id) ? '★' : '☆';
+  b.className = 'bm-btn' + (state.bookmarked.has(q.id)?' on':'');
+}
+
 function toggleZoom(img) { img.classList.toggle('zoomed'); }
 
 // ==================== 统计 ====================
@@ -1664,6 +1744,8 @@ function updateStats() {
   document.getElementById('hWrong').textContent = state.wrong.size;
   document.getElementById('hProg').textContent = ans+'/'+total;
   document.getElementById('wrongBadge').textContent = state.wrong.size;
+  const starChip = document.querySelector('.filter-chip[data-filter="star"]');
+  if (starChip) starChip.textContent = `⭐ 收藏 (${state.bookmarked.size})`;
 }
 
 // ==================== 测验模式 ====================
@@ -1747,6 +1829,7 @@ function endQuiz() {
   });
 
   updateStats();
+  saveState();
 }
 
 // ==================== 阅读模式 ====================
@@ -1768,7 +1851,7 @@ function renderReview() {
     container.innerHTML += `
       <div class="review-item">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:4px;">
-          <span style="font-weight:700;color:#667eea;">#${q.id}</span>
+          <span style="font-weight:700;color:#667eea;">${state.bookmarked.has(q.id)?"★ ":""}#${q.id}</span>
           <span style="font-size:11px;padding:1px 8px;border-radius:10px;background:#e8eaf6;color:#5c6bc0;font-weight:600;">${typeName}</span>
         </div>
         <div class="ri-q">${q.text.replace(/\n/g,'<br>')}</div>
@@ -1789,6 +1872,7 @@ function renderNav() {
     d.textContent = q.id;
     if (state.answered.has(q.id)) {
       d.classList.add(state.wrong.has(q.id)?'err':'done');
+    if (state.bookmarked.has(q.id)) d.textContent = '★'+q.id;
     }
     d.onclick = () => {
       // 找到在筛选后列表中的位置
@@ -1796,7 +1880,7 @@ function renderNav() {
       const idx = filtered.findIndex(x => x.id === q.id);
       if (idx >= 0) {
         state.curIdx = idx;
-        setMode('practice');
+        setMode(state.mode === 'wrong' ? 'wrong' : 'practice');
       }
     };
     grid.appendChild(d);
@@ -1812,6 +1896,8 @@ function resetAll() {
   state.answered = new Set();
   state.wrong = new Set();
   state.submitted = false;
+  const filtered = getFiltered();
+  if (filtered.length === 0 && state.mode === 'wrong') { document.getElementById('qNum').textContent = '🎉 错题已全部消灭！'; document.getElementById('qTypeLabel').textContent=''; document.getElementById('qText').innerHTML='太棒了！你已经把所有错题都做对了。<br>点击 <b>答题卡</b> 查看全部题目，或切换到 <b>刷题</b> 模式继续练习。'; hideAll(); return; }
   state.quizActive = false;
   state.quizOrder = [];
   state.quizIdx = 0;
@@ -1819,9 +1905,34 @@ function resetAll() {
   document.getElementById('resultPanel').classList.remove('show');
   setMode('practice');
   updateStats();
+  saveState();
+}
+
+
+function resetQuiz() {
+  if (!confirm('确定要清除所有答题记录重新开始吗？')) return;
+  if (state.quizTimer) clearInterval(state.quizTimer);
+  state.answers = {};
+  state.results = {};
+  state.answered = new Set();
+  state.wrong = new Set();
+  state.bookmarked = new Set();
+  state.curIdx = 0;
+  state.submitted = false;
+  state.quizActive = false;
+  localStorage.removeItem('qa_answers');
+  localStorage.removeItem('qa_answered');
+  localStorage.removeItem('qa_results');
+  localStorage.removeItem('qa_wrong');
+  localStorage.removeItem('qa_bookmarked');
+  document.getElementById('resultPanel').classList.remove('show');
+  setMode('practice');
+  updateStats();
+  saveState();
 }
 
 // ==================== 初始化 ====================
+loadState();
 updateStats();
 renderQ();
 </script>
