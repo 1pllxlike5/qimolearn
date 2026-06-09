@@ -6,6 +6,12 @@
 __pycache__/
 *.pyc
 
+*.docx
+~$*.docx
+
+# 构建/临时脚本
+_fix_questions.py
+
 # 系统
 .DS_Store
 Thumbs.db

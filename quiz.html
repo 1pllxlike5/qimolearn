@@ -273,7 +273,7 @@
 
   <!-- 题型筛选 -->
   <div class="filter-bar" id="filterBar">
-    <span class="filter-chip active" data-filter="all" onclick="setFilter('all')">全部 (60)</span>
+    <span class="filter-chip active" data-filter="all" onclick="setFilter('all')">全部 (87)</span>
     <span class="filter-chip" data-filter="choice" onclick="setFilter('choice')">选择题</span>
     <span class="filter-chip" data-filter="truefalse" onclick="setFilter('truefalse')">判断题</span>
     <span class="filter-chip" data-filter="fill" onclick="setFilter('fill')">填空题</span>
@@ -347,240 +347,999 @@
 <script>
 // ==================== 题库 ====================
 const QUESTIONS = [
-  { id:1, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'以下哪个不是前端Web开发技术？',
-    opts:['HTML','CSS','JavaScript','MySQL'], ans:3,
-    exp:'MySQL 是数据库管理系统，属于后端技术。前端三剑客：HTML（结构）、CSS（样式）、JavaScript（行为）。' },
-  { id:2, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'HTML 的英文全称是 HyperText Markup Language，其中文含义是？',
-    opts:['超文本标记语言','标准通用标记语言','可扩展标记语言','通用标记语言'], ans:0,
-    exp:'HTML = HyperText Markup Language = 超文本标记语言。HyperText 指超文本（包含链接的文本），Markup 指用标签标记内容。' },
-  { id:3, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'&lt;img&gt; 标签中用于设置替代文本的属性是？',
-    opts:['alt','src','title','width'], ans:0,
-    exp:'alt 属性提供替代文本，图片加载失败时显示；同时有助于 SEO 和无障碍访问（屏幕阅读器会读取 alt 内容）。src 指定图片路径，title 提供悬停提示。' },
-  { id:4, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'以下哪个不是 HTML 标题标签？',
-    opts:['&lt;h6&gt;','&lt;hb&gt;','&lt;title&gt;','&lt;head&gt;'], ans:1,
-    exp:'&lt;hb&gt; 不是 HTML 标准标签。HTML 标题标签为 &lt;h1&gt;~&lt;h6&gt;。&lt;title&gt; 定义页面标题（显示在标签栏），&lt;head&gt; 是文档头部容器。' },
-  { id:5, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'以下哪个标签用于定义表格的行？',
-    opts:['&lt;td&gt;','&lt;th&gt;','&lt;tr&gt;','&lt;table&gt;'], ans:2,
-    exp:'tr = Table Row（表格行），td = Table Data（单元格），th = Table Header（表头单元格），table = 表格容器。' },
-  { id:6, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'以下哪个不是 CSS 背景相关属性？（请对照原题图片确认）',
-    opts:['background-color','background-image','background-position','background-repeat'], ans:-1,
-    exp:'这四个都是合法的 CSS 背景属性。background-color（背景色）、background-image（背景图）、background-position（位置）、background-repeat（重复方式）。如果题目是"以下哪个不是"，则无正确答案。请对照原图确认题目问法。' },
-  { id:7, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'CSS 中正确的注释写法是？',
-    opts:['// 注释','/* 注释 */','&lt;!-- 注释 --&gt;','# 注释'], ans:1,
-    exp:'CSS 使用 /* ... */ 作为注释。// 是 JavaScript/SCSS 的单行注释，&lt;!-- --&gt; 是 HTML 注释。# 在 CSS 中是 id 选择器前缀。' },
-  { id:8, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'CSS 后代选择器（Descendant Selector）使用什么符号？',
-    opts:['>','+','空格','~'], ans:2,
-    exp:'空格表示后代选择器（如 div p 选 div 内所有 p）。> 子元素选择器、+ 相邻兄弟选择器、~ 通用兄弟选择器。' },
-  { id:9, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'CSS 中设置字体颜色使用哪个属性？',
-    opts:['font-color','color','text-color','fgcolor'], ans:1,
-    exp:'color 属性设置文本颜色（前景色）。其他选项都不是标准 CSS 属性。font-size 设字号，font-weight 设粗细。' },
-  { id:10, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'CSS 中设置字体粗细使用哪个属性？',
-    opts:['font-weight','bold','text-bold','weight'], ans:0,
-    exp:'font-weight 设置字体粗细。取值：normal(400)、bold(700)、lighter、bolder 或数字 100-900。bold 是值而非属性名。' },
-  { id:11, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'以下哪个元素的内容不会在浏览器页面中直接显示？',
-    opts:['&lt;title&gt;','&lt;head&gt;','&lt;body&gt;','&lt;html&gt;'], ans:1,
-    exp:'&lt;head&gt; 存放元数据（meta、title、style、link 等），其内容不在页面中渲染。&lt;title&gt; 显示在浏览器标签页上。&lt;body&gt; 内容是页面主体。' },
-  { id:12, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'设置 margin 上10px、右20px、下30px、左40px，正确的是？',
-    opts:['margin:10px 20px 30px 40px','margin:10px 30px','margin:10px','margin:10px 20px 30px'], ans:0,
-    exp:'margin 缩写顺序：上 右 下 左（顺时针）。若只写两个值：上下、左右。一个值：四边统一。' },
-  { id:13, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'CSS 中哪种定位方式相对于最近的已定位祖先元素？',
-    opts:['position:relative','position:absolute','position:fixed','position:static'], ans:1,
-    exp:'absolute 相对于最近的 position 非 static 的祖先元素定位。relative 相对于自身原始位置，fixed 相对于视口，static 是默认值。' },
-  { id:14, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'以下哪个不是 JavaScript 的基本数据类型？',
-    opts:['Number','String','Boolean','Float'], ans:3,
-    exp:'JS 基本类型（7种）：Number、String、Boolean、Null、Undefined、Symbol、BigInt。没有 Float 类型，数字统一用 Number。' },
-  { id:15, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'JavaScript 中用于声明变量的关键字是？',
-    opts:['var','int','float','char'], ans:0,
-    exp:'JS 声明变量用 var、let、const。int、float、char 是 Java/C 等静态类型语言的关键字。ES6 推荐优先用 const，其次 let。' },
-  { id:16, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'HTML 表格中合并列使用的属性是？',
-    opts:['colspan','rowspan','cellpadding','cellspacing'], ans:0,
-    exp:'colspan="n" 合并 n 列，rowspan="n" 合并 n 行。cellpadding 是单元格内边距，cellspacing 是单元格间距（这两个在 HTML5 中已废弃，推荐用 CSS）。' },
-  { id:17, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'以下哪个不是 &lt;input&gt; 的 type 属性值？（请对照原题确认）',
-    opts:['button','submit','reset','image'], ans:-1,
-    exp:'button、submit、reset、image 都是 HTML 标准中有效的 &lt;input type&gt; 值。其中 image 是一种图形化提交按钮。请对照原图确认题目问法。' },
-  { id:18, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'CSS 中 id 选择器使用什么符号？',
-    opts:['#','.','&','*'], ans:0,
-    exp:'#id 选择特定 id 的元素，.class 选择特定 class 的元素，* 通用选择器（选所有元素）。id 在页面中唯一，class 可重复使用。' },
-  { id:19, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
-    text:'SEO 是什么的缩写？',
-    opts:['Search Engine Optimization','Social Engagement Output','Server End Operation','Standard Element Object'], ans:0,
-    exp:'SEO = Search Engine Optimization（搜索引擎优化）。通过优化网站结构和内容提升在搜索引擎中的排名。' },
-  // ---- 图片2：选择题 20-30 ----
-  { id:20, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'&lt;img&gt; 标签中 alt 属性的主要作用是？',
-    opts:['图片无法显示时展示替代文本','设置图片的提示文字','定义图片路径','设置图片尺寸'], ans:0,
-    exp:'alt 提供替代文本，图片加载失败时显示；屏幕阅读器读取 alt 帮助视障用户；搜索引擎抓取 alt 了解图片内容。' },
-  { id:21, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'在 HTML 中引用外部 CSS 文件最常用的方式是？',
-    opts:['&lt;link&gt; 标签','&lt;style&gt; 标签','@import 语句','行内 style 属性'], ans:0,
-    exp:'&lt;link rel="stylesheet" href="style.css"&gt; 是最常用的方式。&lt;style&gt; 用于嵌入 CSS，@import 也可引入但不推荐（阻塞渲染）。' },
-  { id:22, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'&lt;a&gt; 标签中指定链接目标地址的属性是？',
-    opts:['src','target','href','alt'], ans:2,
-    exp:'href（Hypertext Reference）指定链接 URL。target 指定打开方式（_blank 新窗口）。src 用于 img/script/iframe。' },
-  { id:23, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'关于 CSS float 属性，以下说法错误的是？',
-    opts:['float 可使元素脱离文档流','float 值包括 left、right、center','浮动元素导致父元素高度塌陷','clear 可清除浮动'], ans:1,
-    exp:'float 取值：left（左浮动）、right（右浮动）、none（不浮动）。没有 center 值。清除浮动常用 clear:both 或 overflow:hidden。' },
-  { id:24, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'设置 CSS 边框时，以下哪个属性是必须的才能显示边框？',
-    opts:['border-width','border-color','border-style','border-radius'], ans:2,
-    exp:'border-style 必须设置（如 solid、dashed、dotted 等），默认值为 none（不显示边框）。width 和 color 有默认值但仍需 style 配合。' },
-  { id:25, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'以下哪个 CSS 颜色写法是错误的？',
-    opts:['p{color:#F00}','p{color:rgba(255,0,0,1)}','p{color:rgb(255,0,0)}','p{color:rgb(F,0,0)}'], ans:3,
-    exp:'rgb() 的参数必须是数值（0-255）或百分比。rgb(F,0,0) 语法错误。#F00 是 #FF0000 的简写，rgba() 支持透明度。' },
-  { id:26, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'以下哪个值不能用于 padding 属性？',
-    opts:['10px','5%','auto','1em'], ans:2,
-    exp:'padding 不支持 auto 值。auto 可用于 margin（如 margin:0 auto 水平居中）。padding 支持 px、%、em、rem 等单位。' },
-  { id:27, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'以下哪个不是 CSS transform 可实现的变换？',
-    opts:['平移 translate','缩放 scale','旋转 rotate','模糊 blur'], ans:3,
-    exp:'blur（模糊）是 filter 属性的值（filter:blur(5px)）。transform 的变换函数：translate()、scale()、rotate()、skew()。' },
-  { id:28, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'使元素既可设宽高又可并排显示，display 应设为？',
-    opts:['inline','block','flex','inline-block'], ans:3,
-    exp:'inline-block 兼具行内（不换行）和块级（可设宽高）特性。inline 不能设宽高，block 独占一行，flex 是弹性盒布局。' },
-  { id:29, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'以下哪种方式隐藏元素后不占据页面空间？',
-    opts:['opacity:0','visibility:hidden','display:none','z-index:-1'], ans:2,
-    exp:'display:none 彻底移除元素（不占空间）。visibility:hidden 隐藏但仍占位。opacity:0 透明但仍可交互。z-index 控制层叠顺序。' },
-  { id:30, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'设置元素透明度的属性是？',
-    opts:['opacity','visibility','display','z-index'], ans:0,
-    exp:'opacity:0~1 设置透明度（0 完全透明，1 完全不透明）。visibility 控制显隐，display 控制布局行为，z-index 控制层序。' },
-  // ---- 判断题 ----
-  { id:31, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'&lt;head&gt; 中的 CSS 样式对整个页面可见。', ans:true,
-    exp:'正确。&lt;head&gt; 中的 &lt;style&gt; 定义的 CSS 全局作用于当前整个页面。' },
-  { id:32, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'W3C 是制定 Web 标准的国际组织。', ans:true,
-    exp:'正确。W3C（World Wide Web Consortium，万维网联盟）负责制定 HTML、CSS、XML 等 Web 标准。' },
-  { id:33, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'CSS 中某些属性（如 color、font-family）可以被子元素继承。', ans:true,
-    exp:'正确。文字相关属性（color、font-family、font-size、line-height 等）默认可继承。盒模型属性（margin、padding、border）不继承。' },
-  { id:34, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'后代选择器（Descendant Selector）使用空格分隔选择器。', ans:true,
-    exp:'正确。例如 div p 选择 div 内的所有 p 元素（不限层级），空格表示后代关系。' },
-  { id:35, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'&lt;h1&gt; 到 &lt;h6&gt; 表示不同级别标题，&lt;h1&gt; 级别最高。', ans:true,
-    exp:'正确。&lt;h1&gt;（最重要）到 &lt;h6&gt;（最不重要），数字越小级别越高，字号通常越大。' },
-  { id:36, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'Web 标准由结构（HTML）、表现（CSS）、行为（JavaScript）三层组成。', ans:true,
-    exp:'正确。Web 标准倡导结构、表现、行为相分离，分别由 HTML、CSS、JavaScript 实现。' },
-  { id:37, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'有序列表应使用 &lt;ol&gt; 标签。', ans:true,
-    exp:'正确。ol = Ordered List（有序列表），默认显示数字序号。ul = Unordered List（无序列表），默认显示圆点。' },
-  { id:38, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'JavaScript 是 Java 语言的简化版本。', ans:false,
-    exp:'错误。JavaScript 和 Java 是完全不同的语言，只是名字相似。JS 由 Brendan Eich 在 Netscape 开发，最初叫 LiveScript。' },
-  { id:39, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'clear 属性用于清除 float 浮动带来的影响。', ans:true,
-    exp:'正确。clear:left 清除左浮动影响，clear:right 清除右浮动，clear:both 清除两侧。常用 clearfix 方案处理父元素塌陷。' },
-  { id:40, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'CSS 中 id 选择器用 # 号，class 选择器用 . 号。', ans:true,
-    exp:'正确。#id 选中特定 id 元素（唯一）。.class 选中所有具有该 class 的元素（可重复）。' },
-  { id:41, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'line-height 属性用于设置文本的行高。', ans:true,
-    exp:'正确。line-height 设置行高，影响行与行之间的垂直间距。常用值：1.5（相对字号）、24px（固定值）、150%（百分比）。' },
-  { id:42, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
-    text:'&lt;head&gt; 标签中可以存放 &lt;title&gt;、&lt;meta&gt;、&lt;style&gt; 等元素。', ans:true,
-    exp:'正确。&lt;head&gt; 是文档元数据容器，包含 title（标题）、meta（字符编码/描述等）、style（CSS）、link（外部资源）等。' },
-  // ---- 填空题 ----
-  { id:43, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'在 HTML 中，&lt;meta charset="____"&gt; 用于设置字符编码。',
-    ans:['utf-8','utf8','UTF-8','UTF8'],
-    exp:'最常用的字符编码是 UTF-8（Unicode 编码），支持全球几乎所有字符。设置位置：&lt;meta charset="UTF-8"&gt; 放在 &lt;head&gt; 中。' },
-  { id:44, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'Web 三层标准：结构对应 HTML，表现对应 CSS，行为对应＿＿。',
-    ans:['javascript','JavaScript','JS','js'],
-    exp:'Web 三层架构：结构层（HTML 负责内容和结构）、表现层（CSS 负责样式和布局）、行为层（JavaScript 负责交互和功能）。' },
-  { id:45, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'CSS 中设置元素不显示且不占空间的 display 值是＿＿。',
-    ans:['none'],
-    exp:'display:none 隐藏元素且不占据页面空间，元素从文档流中完全移除。与之对比：visibility:hidden 隐藏但保留占位。' },
-  { id:46, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'CSS 盒模型（Box Model）由 margin、border、padding 和＿＿组成。',
-    ans:['content','内容','content区域'],
-    exp:'盒模型从外到内：margin（外边距）→ border（边框）→ padding（内边距）→ content（内容区域）。总宽度 = margin + border + padding + content。' },
-  { id:47, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'CSS 伪元素 ::before 和 ::after 必须配合＿＿属性使用。',
-    ans:['content'],
-    exp:'::before 和 ::after 必须设置 content 属性才能生效（即使为空字符串 content:""）。它们分别在元素内容的前后插入生成内容。' },
-  { id:48, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'颜色值 #336699 的简写形式是＿＿。',
-    ans:['#369'],
-    exp:'六位十六进制颜色每两位相同时可简写为三位：#336699 → #369，#FF0000 → #F00，#AABBCC → #ABC。' },
-  { id:49, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'CSS 选择器优先级：!important > 行内样式 > ＿＿选择器 > class选择器 > 标签选择器。',
-    ans:['id','ID'],
-    exp:'CSS 优先级（从高到低）：!important > 行内样式（内联 style）> id 选择器（#）> class/属性/伪类选择器（. / [] / :）> 标签/伪元素选择器（div / ::before）。' },
-  { id:50, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'CSS3 中控制元素尺寸计算方式的属性是＿＿-＿＿。',
-    ans:['box-sizing','boxsizing'],
-    exp:'box-sizing 有两个值：content-box（默认，宽高只算内容区，padding+border 在外）和 border-box（宽高包含 padding+border，更直观）。' },
-  { id:51, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'Flexbox 布局通过设置 display:＿＿ 来启用弹性盒模型。',
-    ans:['flex'],
-    exp:'display:flex 启用弹性盒布局，容器称为 flex container，子元素自动成为 flex item。flex 布局让水平垂直居中、等分排列变得简单。' },
-  { id:52, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'JavaScript 中使用＿＿关键字声明常量（值不可重新赋值）。',
-    ans:['const'],
-    exp:'const 声明常量，一旦赋值不可重新绑定。let 声明可变变量（块级作用域），var 声明变量（函数级作用域）。ES6 推荐优先使用 const。' },
-  { id:53, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
-    text:'&lt;input type="＿＿"&gt; 创建提交按钮，点击后提交表单。',
-    ans:['submit'],
-    exp:'type="submit" 创建表单提交按钮，点击后触发表单提交。type="reset" 重置表单，type="button" 普通按钮（需绑定 JS）。' },
-  // ---- 编程题 ----
-  { id:54, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
-    text:'求值：\nvar a = 9;\nvar b = (--a) + (a--);\n请问 b 的值是多少？',
-    ans:['16'],
-    exp:'详细过程：\n1. --a：前缀递减，a 先减1变成 8，表达式返回 8\n2. a--：后缀递减，表达式先返回 a 当前值（8），然后 a 减1变成 7\n3. b = 8 + 8 = 16\n关键：前缀先变后用，后缀先用后变。' },
-  { id:55, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
-    text:'求值：\nvar m = 7;\nm *= 3 + 2;\n请问 m 的值是多少？',
-    ans:['35'],
-    exp:'详细过程：\n1. 复合赋值运算符 *= 优先级低于 +（加法）\n2. 先算 3 + 2 = 5\n3. m = m * 5 = 7 * 5 = 35\n注意：*= 相当于 m = m * (右侧整体表达式)。' },
-  { id:56, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
-    text:'求值：\nlet s = 0;\nfor(let i=2; i<=10; i+=2) {\n  s += i;\n}\nconsole.log(s);\n输出结果是什么？',
-    ans:['30'],
-    exp:'详细过程：\n循环 i 从 2 到 10，步长为 2（即 2,4,6,8,10）\ns = 0+2 = 2\ns = 2+4 = 6\ns = 6+6 = 12\ns = 12+8 = 20\ns = 20+10 = 30\n最终 s = 30' },
-  { id:57, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
-    text:'CSS 盒模型计算：\ndiv 样式如下（标准盒模型 content-box）：\nwidth:200px; padding:10px; border:5px solid #000;\n请问该 div 实际总宽度是多少 px？',
-    ans:['230','230px'],
-    exp:'content-box 模式下：总宽度 = width + padding×2 + border×2\n= 200 + 10×2 + 5×2\n= 200 + 20 + 10\n= 230px' },
-  { id:58, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
-    text:'CSS 盒模型计算：\ndiv 样式如下（border-box）：\nwidth:200px; padding:10px; border:5px solid #000;\n请问该 div 实际总宽度是多少 px？',
-    ans:['200','200px'],
-    exp:'border-box 模式下，width 已经包含了 padding 和 border。\n总宽度就是声明的 200px\n内容区实际宽度 = 200 - 10×2 - 5×2 = 170px' },
-  { id:59, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
-    text:'CSS 盒模型计算：\ndiv 样式如下（border-box）：\nwidth:220px; padding:10px 20px; border:4px solid #000;\n请问总宽度和内容区宽度分别是多少 px？（逗号分隔，如 220,172）',
-    ans:['220,172','220,172px'],
-    exp:'border-box 模式下：\n总宽度 = 220px（声明值）\npadding 左右各 20px = 40px\nborder 左右各 4px = 8px\n内容区 = 220 - 40 - 8 = 172px' },
-  // ---- 简答题 ----
-  { id:60, type:'essay', img:'db0d8116f116f331d32646467101eef7.jpg',
-    text:'请简述如何在 HTML/CSS 中实现背景图片（images/dot.gif）平铺且不随滚动滚动的效果。',
-    ans:['background'],
-    exp:'参考答案：\n1. 设置背景图片：background-image: url("images/dot.gif");\n2. 禁止平铺：background-repeat: no-repeat;\n3. 固定背景不滚动：background-attachment: fixed;\n简写：background: url("images/dot.gif") no-repeat fixed;\n注意：fixed 使背景相对于视口固定，滚动页面时背景不动。' },
+{
+    id: 1,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '下列不属于Web前端核心技术的是（）',
+    opts: [
+      'HTML',
+      'CSS',
+      'JavaScript',
+      'MySQL'
+    ],
+    ans: 3,
+    exp: 'Web前端三剑客是HTML（结构）、CSS（样式）、JavaScript（行为）。MySQL是数据库管理系统，属于后端技术。'
+  },
+{
+    id: 2,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'HTML的中文全称是（）',
+    opts: [
+      '超文本标记语言',
+      '层叠样式表',
+      '脚本语言',
+      '标记语言'
+    ],
+    ans: 0,
+    exp: 'HTML = HyperText Markup Language = 超文本标记语言。层叠样式表是CSS。'
+  },
+{
+    id: 3,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '插入图片时，用于指定图片路径的属性是（）',
+    opts: [
+      'alt',
+      'src',
+      'title',
+      'width'
+    ],
+    ans: 1,
+    exp: 'src（source）属性指定图片文件的URL路径。alt是替代文本，title是悬停提示。'
+  },
+{
+    id: 4,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'HTML中表示一级标题的标签是（）',
+    opts: [
+      '&lt;h6&gt;',
+      '&lt;h1&gt;',
+      '&lt;title&gt;',
+      '&lt;head&gt;'
+    ],
+    ans: 1,
+    exp: '&lt;h1&gt;表示一级标题（最大），&lt;h6&gt;表示六级标题（最小）。&lt;title&gt;定义文档标题显示在标签栏。'
+  },
+{
+    id: 5,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '表格中定义行的标签是（）',
+    opts: [
+      '&lt;td&gt;',
+      '&lt;th&gt;',
+      '&lt;tr&gt;',
+      '&lt;table&gt;'
+    ],
+    ans: 2,
+    exp: 'tr = Table Row（行），td = Table Data（单元格），th = Table Header（表头）。'
+  },
+{
+    id: 6,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '下列CSS属性中，用于指定背景图片的是（）',
+    opts: [
+      'background-color',
+      'background-image',
+      'background-position',
+      'background-repeat'
+    ],
+    ans: 1,
+    exp: 'background-image: url("图片路径") 用于设置背景图片。其他选项分别设置颜色、位置和重复方式。'
+  },
+{
+    id: 7,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'CSS注释正确写法是（）',
+    opts: [
+      '//注释',
+      '/* 注释 */',
+      '&lt;!-- 注释 --&gt;',
+      '# 注释'
+    ],
+    ans: 1,
+    exp: 'CSS使用 /* ... */ 作为注释。// 是JavaScript注释，&lt;!-- --&gt; 是HTML注释。'
+  },
+{
+    id: 8,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '下面为子代选择器（child selector）结合符的是（）',
+    opts: [
+      '&gt;',
+      '+',
+      '空格',
+      '~'
+    ],
+    ans: 0,
+    exp: '&gt; 是子代选择器（选直接子元素）。空格是后代选择器（选所有后代），+是相邻兄弟选择器。'
+  },
+{
+    id: 9,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'CSS中设置文字颜色的属性是（）',
+    opts: [
+      'font-color',
+      'color',
+      'text-color',
+      'fgcolor'
+    ],
+    ans: 1,
+    exp: 'color属性设置文字颜色（前景色）。其他都不是标准CSS属性。'
+  },
+{
+    id: 10,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'CSS中设置文字加粗的属性是（）',
+    opts: [
+      'font-weight',
+      'bold',
+      'text-bold',
+      'weight'
+    ],
+    ans: 0,
+    exp: 'font-weight设置字体粗细，取值：normal(400)、bold(700)或数字100~900。bold是值而非属性名。'
+  },
+{
+    id: 11,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'HTML文档的树状结构中，（）标签为文档的根节点，位于结构中的最顶层。',
+    opts: [
+      '&lt;title&gt;',
+      '&lt;head&gt;',
+      '&lt;body&gt;',
+      '&lt;html&gt;'
+    ],
+    ans: 3,
+    exp: '&lt;html&gt;是文档根元素（最顶层），&lt;head&gt;和&lt;body&gt;是它的子元素。'
+  },
+{
+    id: 12,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '设置盒子模型外边距：上10px、右20px、下30px、左20px，正确的是（）',
+    opts: [
+      'margin:10px 20px 30px 40px',
+      'margin:10px 30px',
+      'margin:10px',
+      'margin:10px 20px 30px'
+    ],
+    ans: 3,
+    exp: 'margin缩写按 上 右 下 左（顺时针）。三个值：上=10，右=20，下=30，左=右=20。'
+  },
+{
+    id: 13,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '让元素固定在浏览器窗口的是（）',
+    opts: [
+      'position:relative',
+      'position:absolute',
+      'position:fixed',
+      'position:static'
+    ],
+    ans: 2,
+    exp: 'fixed相对于视口（浏览器窗口）固定，不随滚动移动。relative相对自身，absolute相对定位祖先。'
+  },
+{
+    id: 14,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '下列不属于JavaScript数据类型的是（）',
+    opts: [
+      'Number',
+      'String',
+      'Boolean',
+      'Float'
+    ],
+    ans: 3,
+    exp: 'JS基本类型：Number、String、Boolean、Null、Undefined、Symbol、BigInt。没有Float，数字统一用Number。'
+  },
+{
+    id: 15,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'JavaScript中用于声明变量的关键字是（）',
+    opts: [
+      'var',
+      'int',
+      'float',
+      'char'
+    ],
+    ans: 0,
+    exp: 'JS使用var、let、const声明变量。int、float、char是C/Java等静态类型语言的关键字。'
+  },
+{
+    id: 16,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '合并横向单元格使用的属性是（）',
+    opts: [
+      'colspan',
+      'rowspan',
+      'cellpadding',
+      'cellspacing'
+    ],
+    ans: 0,
+    exp: 'colspan合并列（横向），rowspan合并行（纵向）。cellpadding和cellspacing已废弃，改用CSS。'
+  },
+{
+    id: 17,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '表单中用于提交数据的按钮类型是（）',
+    opts: [
+      'button',
+      'submit',
+      'reset',
+      'image'
+    ],
+    ans: 1,
+    exp: 'type="submit"提交表单数据。button普通按钮，reset重置表单，image是图片提交按钮（也提交数据但不如submit常用）。'
+  },
+{
+    id: 18,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: 'CSS类选择器以什么符号开头（）',
+    opts: [
+      '#',
+      '.',
+      '&',
+      '*'
+    ],
+    ans: 1,
+    exp: '.class命名类选择器，#id命名id选择器，*是通用选择器。'
+  },
+{
+    id: 19,
+    type: 'choice',
+    img: '7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text: '以下哪个标签用于定义HTML文档的标题？（）',
+    opts: [
+      '&lt;h1&gt;',
+      '&lt;title&gt;',
+      '&lt;header&gt;',
+      '&lt;head&gt;'
+    ],
+    ans: 1,
+    exp: '&lt;title&gt;定义网页标题（显示在浏览器标签页/标题栏）。&lt;h1&gt;是页面内容中的一级标题。'
+  },
+{
+    id: 20,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '以下关于&lt;img&gt;标签的alt属性说法正确的是。（）',
+    opts: [
+      'alt属性只能包含纯文本',
+      'alt属性可有可无，不影响图像显示',
+      'alt属性当图像无法显示时起作用',
+      'ALT属性可以包含HTML标签'
+    ],
+    ans: 2,
+    exp: 'alt属性在图片无法加载时显示替代文本，同时被屏幕阅读器读取，有助于无障碍访问和SEO。'
+  },
+{
+    id: 21,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '以下哪种HTML列表类型适合用于展示一系列没有特定顺序的项目？（）',
+    opts: [
+      '有序列表',
+      '无序列表',
+      '定义列表',
+      '以上都不是'
+    ],
+    ans: 1,
+    exp: '无序列表（ul）用于没有特定顺序的项目，默认用圆点标记。有序列表（ol）用数字编号。'
+  },
+{
+    id: 22,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '超链接标签&lt;a&gt;中，用于指定链接目标地址的属性是？（）',
+    opts: [
+      'src',
+      'target',
+      'href',
+      'alt'
+    ],
+    ans: 2,
+    exp: 'href（Hypertext Reference）指定链接URL。target指定打开方式，src用于img/script。'
+  },
+{
+    id: 23,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '以下关于CSS浮动（float）属性的说法，正确的是。（）',
+    opts: [
+      'float只能应用于块级元素',
+      'float值可以为left、right、center',
+      'float使元素脱离标准文档流',
+      '浮动元素不影响其他元素布局'
+    ],
+    ans: 2,
+    exp: 'float使元素脱离标准文档流，向左或向右浮动，直到碰到父容器边界或其他浮动元素。clear用于清除浮动。'
+  },
+{
+    id: 24,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '以下哪个属性可以用来设置盒子的边框样式？（）',
+    opts: [
+      'border-width',
+      'border-color',
+      'border-style',
+      'border-radius'
+    ],
+    ans: 2,
+    exp: 'border-style设置边框样式（如solid、dashed、dotted）。必须设置才能显示边框。border-width设粗细，border-color设颜色。'
+  },
+{
+    id: 25,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '设置所有的标签p的字体颜色为红色，下列语法错误的是。（）',
+    opts: [
+      'p{color:#F00}',
+      'p{color:rgba(255,0,0,1)}',
+      'p{color:rgb(255,0,0)}',
+      'p{color:rgb(F,0,0)}'
+    ],
+    ans: 3,
+    exp: 'rgb()参数必须为数值（0-255）或百分比。rgb(F,0,0)语法错误。#F00 = #FF0000，rgba()支持alpha透明度。'
+  },
+{
+    id: 26,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'padding的值不能是。（）',
+    opts: [
+      '10px',
+      '5%',
+      'auto',
+      '1em'
+    ],
+    ans: 2,
+    exp: 'padding不支持auto。auto可用于margin（如margin:0 auto水平居中）。padding支持px、%、em等。'
+  },
+{
+    id: 27,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '下面为不是transform属性实现的变换。（）',
+    opts: [
+      '平移',
+      '缩放',
+      '倾斜',
+      '过渡'
+    ],
+    ans: 3,
+    exp: 'transform的变换函数：translate()平移、scale()缩放、rotate()旋转、skew()倾斜。过渡（transition）是单独属性。'
+  },
+{
+    id: 28,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '若要将一个inline元素转换为block元素，应设置display属性的值为？（）',
+    opts: [
+      'inline',
+      'block',
+      'ease-in',
+      'inline-block'
+    ],
+    ans: 1,
+    exp: 'display:block将元素转为块级（独占一行，可设宽高）。inline-block不换行但可设宽高。'
+  },
+{
+    id: 29,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '以下哪种属性可以设置元素的透明度？（）',
+    opts: [
+      'opacity',
+      'visibility',
+      'display',
+      'z-index'
+    ],
+    ans: 0,
+    exp: 'opacity:0~1设置透明度（0完全透明，1不透明）。visibility控制显隐，display控制布局。'
+  },
+{
+    id: 30,
+    type: 'choice',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '以下哪个属性可以改变元素的堆叠顺序？（）',
+    opts: [
+      'opacity',
+      'visibility',
+      'display',
+      'z-index'
+    ],
+    ans: 3,
+    exp: 'z-index设置元素堆叠顺序（叠放次序），值越大越靠上。只对定位元素（position非static）生效。'
+  },
+{
+    id: 31,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '&lt;head&gt;标签中的内容会直接显示在浏览器的页面上。',
+    ans: false,
+    exp: '错误。&lt;head&gt;存放元数据（title、meta、style等），内容不在页面中显示。只有&lt;body&gt;内容会渲染。'
+  },
+{
+    id: 32,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'W3C盒模型在计算规格时，要将内边距、外边距、边框、内容的尺寸都算上。',
+    ans: true,
+    exp: '正确。W3C标准盒模型（content-box）：总宽 = margin + border + padding + content。'
+  },
+{
+    id: 33,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'CSS权重值相同的情况下，以就近原则决定显示效果。',
+    ans: true,
+    exp: '正确。CSS层叠规则：相同优先级下，后定义的（离元素更近的）样式覆盖先定义的。'
+  },
+{
+    id: 34,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '有序列表与无序列表为最基本列表，消除默认外观后效果相同。',
+    ans: true,
+    exp: '正确。通过CSS重置（list-style:none; padding:0;），有序列表(&lt;ol&gt;)和无序列表(&lt;ul&gt;)外观可以完全一样。'
+  },
+{
+    id: 35,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '&lt;h1&gt;到&lt;h6&gt;字体逐级变大。',
+    ans: false,
+    exp: '错误。&lt;h1&gt;（一级标题）最大，&lt;h6&gt;最小，是逐级变小。数字越小级别越高，字号越大。'
+  },
+{
+    id: 36,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'WEB开发时，一定切忌使用绝对路径，否则会出现路径识别错误现象。',
+    ans: true,
+    exp: '正确。推荐使用相对路径，避免使用绝对路径（如C:\\...或http://...），否则在迁移部署时容易出错。'
+  },
+{
+    id: 37,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '有序列表使用&lt;ol&gt;标签。',
+    ans: true,
+    exp: '正确。ol = Ordered List（有序列表），默认显示数字序号。ul = Unordered List（无序列表）。'
+  },
+{
+    id: 38,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'JavaScript用于实现网页的交互效果。',
+    ans: true,
+    exp: '正确。JavaScript是Web的行为层，负责实现页面交互、动态效果、数据处理等功能。'
+  },
+{
+    id: 39,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '&lt;br&gt;标签可以实现换行。',
+    ans: true,
+    exp: '正确。&lt;br&gt;（break）是空标签，在文本中插入换行。'
+  },
+{
+    id: 40,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'clear属性用于清除浮动。',
+    ans: true,
+    exp: '正确。clear:left/right/both用于清除浮动影响，防止浮动元素影响后续元素布局。'
+  },
+{
+    id: 41,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '一个元素可以应用多个id样式和类样式。',
+    ans: false,
+    exp: '错误。一个元素只能有一个id（唯一标识），但可以有多个class（用空格分隔，如class="a b c"）。'
+  },
+{
+    id: 42,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '对于文本控制时，line-height可以文字实现垂直居中效果。',
+    ans: true,
+    exp: '正确。设置line-height等于容器高度，可以使单行文本在垂直方向上居中。'
+  },
+{
+    id: 43,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '&lt;head&gt;标签中的内容会直接显示在浏览器的页面上。（重复）',
+    ans: false,
+    exp: '错误。同第1题，&lt;head&gt;内容不在页面显示。'
+  },
+{
+    id: 44,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '在HTML中，有序列表和无序列表不能同时出现在同一个页面中。',
+    ans: false,
+    exp: '错误。有序列表(&lt;ol&gt;)和无序列表(&lt;ul&gt;)可以任意组合出现在同一页面中。'
+  },
+{
+    id: 45,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '在HTML表格中，colspan属性用于设置单元格跨越多行。',
+    ans: false,
+    exp: '错误。colspan跨列（横向合并），rowspan跨行（纵向合并）。'
+  },
+{
+    id: 46,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'letter-spacing属性用于设定单词之间的间距。',
+    ans: false,
+    exp: '错误。letter-spacing设置字符间距（字间距），word-spacing设置单词间距。'
+  },
+{
+    id: 47,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '子元素可以通过自身定义的样式覆盖继承自父元素的样式。',
+    ans: true,
+    exp: '正确。CSS继承中，子元素自身定义的样式优先级高于继承自父元素的样式（就近原则）。'
+  },
+{
+    id: 48,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '在CSS中，设置padding为负值时，padding会自动调整为0。',
+    ans: true,
+    exp: '正确。padding不支持负值，如果设置为负数，浏览器会忽略并将其视为0。margin可以设置负值。'
+  },
+{
+    id: 49,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: '背景渐变可以应用于HTML中的所有元素。',
+    ans: true,
+    exp: '正确。background-image支持linear-gradient、radial-gradient等渐变，可应用于任何HTML元素。'
+  },
+{
+    id: 50,
+    type: 'truefalse',
+    img: '7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text: 'position:fixed定位的元素会相对于浏览器窗口固定，不随页面滚动而移动。',
+    ans: true,
+    exp: '正确。fixed固定定位相对于视口（viewport），页面滚动时元素位置不变，常用于固定导航栏。'
+  },
+{
+    id: 51,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'HTML文档中，用于定义网页标题的标签是&lt;＿＿&gt;，通常放在&lt;head&gt;标签内。',
+    ans: [
+      'title',
+      'Title',
+      'TITLE'
+    ],
+    exp: '&lt;title&gt;定义网页标题（显示在浏览器标签页），放在&lt;head&gt;内。&lt;mate&gt;不是标准标签，正确是&lt;title&gt;。'
+  },
+{
+    id: 52,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'WEB标准由三部分构成：结构对应HTML，表现对应CSS，行为对应＿＿。',
+    ans: [
+      'JavaScript',
+      'Javascript',
+      'JS',
+      'js'
+    ],
+    exp: 'Web三层架构：结构层(HTML)、表现层(CSS)、行为层(JavaScript)。'
+  },
+{
+    id: 53,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'CSS中块级元素的display默认值是＿＿。',
+    ans: [
+      'block'
+    ],
+    exp: '块级元素（如div、p、h1等）默认display:block，独占一行，可设宽高。'
+  },
+{
+    id: 54,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'CSS盒子模型由内容、内边距、边框、＿＿四部分组成。',
+    ans: [
+      '外边距',
+      'margin'
+    ],
+    exp: '盒模型从外到内：margin（外边距）→ border（边框）→ padding（内边距）→ content（内容）。'
+  },
+{
+    id: 55,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'CSS伪元素::before的作用是＿＿。',
+    ans: [
+      '在元素内容之前插入内容',
+      '插入内容',
+      '生成内容',
+      '插入'
+    ],
+    exp: '::before在元素内容之前插入生成的内容，必须配合content属性使用。'
+  },
+{
+    id: 56,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '颜色值#336699可以简写为#369，则#44aad2可以简写为＿＿。',
+    ans: [
+      '#4ad'
+    ],
+    exp: '十六进制颜色每两位相同时可简写为三位：#44aad2 → #4ad。'
+  },
+{
+    id: 57,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '块级元素垂直排列时，会发生＿＿效果，即二者间距离由较大的外边距决定。',
+    ans: [
+      '外边距合并',
+      '外边距折叠',
+      'margin合并',
+      'margin折叠',
+      '合并',
+      '折叠'
+    ],
+    exp: '外边距合并（Margin Collapse）：垂直相邻的块级元素，上下外边距取最大值，不叠加。'
+  },
+{
+    id: 58,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '多行文本框在声明时，需要使用＿＿标签。',
+    ans: [
+      'textarea',
+      '&lt;textarea&gt;'
+    ],
+    exp: '&lt;textarea&gt;创建多行文本输入框，可设置rows和cols属性。'
+  },
+{
+    id: 59,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '在CSS层叠样式表当中经常用到的三种选择器：元素选择器、＿＿选择器、id选择器。',
+    ans: [
+      'class',
+      '类',
+      '.'
+    ],
+    exp: '三大基本选择器：元素选择器（div）、class选择器（.class）、id选择器（#id）。'
+  },
+{
+    id: 60,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '使用＿＿属性，可以设置文本修饰线。',
+    ans: [
+      'text-decoration'
+    ],
+    exp: 'text-decoration设置文本修饰：underline（下划线）、overline（上划线）、line-through（删除线）。'
+  },
+{
+    id: 61,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'for语句属于＿＿结构。',
+    ans: [
+      '循环'
+    ],
+    exp: 'for是循环结构，用于重复执行代码块。其他循环结构：while、do...while。'
+  },
+{
+    id: 62,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '制作普通按钮时，可以使用&lt;input type="button"&gt;，也可以使用＿＿标签。',
+    ans: [
+      'button',
+      '&lt;button&gt;'
+    ],
+    exp: '&lt;button&gt;标签也可创建按钮，且内容更灵活（可包含HTML元素）。'
+  },
+{
+    id: 63,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '声明页面文档时，需要声明字符集，其中简体中文为charset=＿＿。',
+    ans: [
+      'utf-8',
+      'utf8',
+      'UTF-8',
+      'UTF8'
+    ],
+    exp: '简体中文推荐使用UTF-8编码：&lt;meta charset="UTF-8"&gt;。'
+  },
+{
+    id: 64,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '使元素在水平和垂直方向同时放大2倍的transform属性值为＿＿。',
+    ans: [
+      'scale(2)',
+      'scale(2,2)',
+      'scale(2, 2)'
+    ],
+    exp: 'transform:scale(2) 或 scale(2,2) 使元素在水平和垂直方向同时放大2倍。'
+  },
+{
+    id: 65,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'border-radius:10px 20px / 30px 40px，则右上角的水平圆角半径为＿＿。',
+    ans: [
+      '20px',
+      '20px/40px'
+    ],
+    exp: '简写中 / 前为水平半径（左上 右上 右下 左下），/ 后为垂直半径。右上角水平=20px，垂直=40px。'
+  },
+{
+    id: 66,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '块级元素垂直排列时，会发生＿＿效果，即二者间距离由较大的外边距决定。（与57题重复）',
+    ans: [
+      '外边距合并',
+      '外边距折叠',
+      'margin合并',
+      'margin折叠'
+    ],
+    exp: '外边距合并（Margin Collapse），参考第57题。'
+  },
+{
+    id: 67,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'HTML有序列表中，使用reversed属性可以让列表编号呈现＿＿顺序。',
+    ans: [
+      '倒序',
+      '递减',
+      '倒序/递减'
+    ],
+    exp: 'reversed属性使有序列表编号从大到小递减（倒序排列）。'
+  },
+{
+    id: 68,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '&lt;input type="＿＿"&gt;用于创建普通的单行文本输入框。',
+    ans: [
+      'text'
+    ],
+    exp: 'type="text"创建单行文本输入框，是input元素的默认类型。'
+  },
+{
+    id: 69,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '在CSS中，使用＿＿选择器可以选中页面上所有&lt;p&gt;标签的元素。',
+    ans: [
+      '元素',
+      '标签',
+      '类型'
+    ],
+    exp: '元素选择器（标签选择器）：直接写标签名，如p { color: red; }选中所有&lt;p&gt;元素。'
+  },
+{
+    id: 70,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: 'JavaScript中数组的索引从＿＿开始。',
+    ans: [
+      '0'
+    ],
+    exp: 'JS数组索引从0开始，第一个元素索引为0，第二个为1，依此类推。'
+  },
+{
+    id: 71,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '密码输入框的type属性值是＿＿。',
+    ans: [
+      'password'
+    ],
+    exp: 'type="password"创建密码输入框，输入内容被遮盖（显示为圆点或星号）。'
+  },
+{
+    id: 72,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '如果要将一个正方形容器转化为正圆形，则应设置＿＿属性值为50%。',
+    ans: [
+      'border-radius'
+    ],
+    exp: 'border-radius:50% 可将正方形变为正圆形。border-radius设百分比时相对于元素尺寸。'
+  },
+{
+    id: 73,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '在JavaScript脚本语言当中，定义函数使用＿＿关键字表示。',
+    ans: [
+      'function'
+    ],
+    exp: 'function关键字定义函数：function 函数名() { ... }。ES6也支持箭头函数 ()=>{}。'
+  },
+{
+    id: 74,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '设置文本首行缩进的属性是＿＿。',
+    ans: [
+      'text-indent'
+    ],
+    exp: 'text-indent设置首行缩进，常用：text-indent:2em（缩进两个汉字宽度）。'
+  },
+{
+    id: 75,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '若要选择div元素内所有的p元素，应使用的CSS复合选择器是＿＿。',
+    ans: [
+      'div p',
+      'div>p'
+    ],
+    exp: 'div p（后代选择器）选择div内所有p元素。div>p（子代选择器）只选直接子元素。'
+  },
+{
+    id: 76,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '在CSS盒子模型中，用于设置元素内容与边框之间空间的属性是＿＿。',
+    ans: [
+      'padding'
+    ],
+    exp: 'padding（内边距）设置内容与边框之间的空间。margin（外边距）设置元素与元素之间的空间。'
+  },
+{
+    id: 77,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '用于清除浮动影响的属性是＿＿。',
+    ans: [
+      'clear'
+    ],
+    exp: 'clear:left/right/both清除浮动影响。常用clearfix方案解决父元素高度塌陷。'
+  },
+{
+    id: 78,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '视频与音频元素在控制时，如果需要运行时自动播放，应使用＿＿属性。',
+    ans: [
+      'autoplay'
+    ],
+    exp: 'autoplay属性让媒体文件加载后自动播放：&lt;video autoplay&gt;。常与muted配合使用。'
+  },
+{
+    id: 79,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '在CSS中，设置margin:0px auto;可以使盒子在水平方向上＿＿。',
+    ans: [
+      '居中'
+    ],
+    exp: 'margin:0 auto 使块级元素在父容器中水平居中（auto平分剩余空间）。'
+  },
+{
+    id: 80,
+    type: 'fill',
+    img: 'af3a4711726466fb737a31e5af218583.jpg',
+    text: '使用relative定位时，元素会相对于其＿＿位置进行偏移。',
+    ans: [
+      '自身',
+      '原来',
+      '自身/原来'
+    ],
+    exp: 'position:relative相对于元素自身原本的位置进行偏移，不脱离文档流，原有位置保留。'
+  },
+{
+    id: 81,
+    type: 'code',
+    img: 'db0d8116f116f331d32646467101eef7.jpg',
+    text: '已知有如下代码：\nvar a = 9;\nvar b = (--a) + (a--);\n求 b 的值。',
+    ans: [
+      '16'
+    ],
+    exp: '详细过程：\n1. --a（前缀递减）：a先减1变成8，表达式返回值8\n2. a--（后缀递减）：表达式先返回当前值8，然后a减1变成7\n3. b = 8 + 8 = 16\n关键：前缀先变后用，后缀先用后变。'
+  },
+{
+    id: 82,
+    type: 'code',
+    img: 'db0d8116f116f331d32646467101eef7.jpg',
+    text: '已知有如下代码：\nvar m = 7;\nm *= 3 + 2;\n求 m 的值。',
+    ans: [
+      '35'
+    ],
+    exp: '详细过程：\n1. += 优先级低于 +，先算 3 + 2 = 5\n2. m = m * 5 = 7 * 5 = 35\n注意：复合赋值运算符优先级低于算术运算符。'
+  },
+{
+    id: 83,
+    type: 'code',
+    img: 'db0d8116f116f331d32646467101eef7.jpg',
+    text: '已知有如下代码：\nlet s = 0;\nfor(let i=2; i<=10; i+=2) {\n  s += i;\n}\nconsole.log(s);\n输出的值是什么？',
+    ans: [
+      '30'
+    ],
+    exp: '循环变量i从2到10，步长为2：\ni=2时 s=2\ni=4时 s=6\ni=6时 s=12\ni=8时 s=20\ni=10时 s=30\n最终s=30'
+  },
+{
+    id: 84,
+    type: 'code',
+    img: 'db0d8116f116f331d32646467101eef7.jpg',
+    text: '已知有标准盒模型元素样式如下：\nwidth:200px;\npadding:10px;\nborder:5px solid #000;\n则该盒模型的总宽度为？',
+    ans: [
+      '230',
+      '230px',
+      '230px'
+    ],
+    exp: '标准盒模型（content-box）下：\n总宽度 = width + padding×2 + border×2\n= 200 + 10×2 + 5×2 = 200+20+10 = 230px'
+  },
+{
+    id: 85,
+    type: 'code',
+    img: 'db0d8116f116f331d32646467101eef7.jpg',
+    text: '已知有盒模型元素样式如下：\nwidth:200px;\npadding:10px;\nborder:5px solid #000;\nbox-sizing:border-box;\n则该盒模型的总宽度为？',
+    ans: [
+      '200',
+      '200px',
+      '200px'
+    ],
+    exp: 'border-box盒模型中：\n总宽度 = 声明的width = 200px（已包含padding和border）\n内容区实际宽度 = 200-10×2-5×2 = 170px'
+  },
+{
+    id: 86,
+    type: 'code',
+    img: 'db0d8116f116f331d32646467101eef7.jpg',
+    text: '已知有盒模型元素样式如下：\nwidth:220px;\npadding:10px 20px;\nborder:4px solid #000;\nbox-sizing:border-box;\n则该盒模型的总宽度为？',
+    ans: [
+      '220',
+      '220px',
+      '220px'
+    ],
+    exp: 'border-box盒模型中：总宽度 = width = 220px\n（padding:10px 20px 表示上下10px左右20px，padding左右共40px，border左右共8px）'
+  },
+{
+    id: 87,
+    type: 'essay',
+    img: 'db0d8116f116f331d32646467101eef7.jpg',
+    text: '使用HTML+CSS制作一个文章列表页，假设图片存在位置为images文件夹下的dot.gif。\n要求：\n1. 写出HTML结构部分的Emmet公式（5分）\n2. 标签、属性、内容要声明清晰完整（5分）\n3. CSS简洁（5分）',
+    ans: [
+      '文章列表',
+      'HTML'
+    ],
+    exp: '参考答案：\n\nHTML Emmet快速生成：\nul>li*6>a[href="#"]>h2{文章标题}+span{2013-12-08}\n\nHTML结构：\n<article>\n  <ul class="article-list">\n    <li><a href="#"><h2>文章标题</h2><span>2013-12-08</span></a></li>\n    <!-- 重复6次 -->\n  </ul>\n</article>\n\nCSS关键样式：\n.article-list { list-style:none; padding:0; }\n.article-list li { border-bottom:1px solid #eee; }\n.article-list li a { background:url("images/dot.gif") no-repeat left center; padding-left:30px; text-decoration:none; display:block; }'
+  },
 ];
+
 
 // ==================== 状态 ====================
 let state = {
