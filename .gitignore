@@ -1,0 +1,11 @@
+# 忽略原始图片（已内嵌到 HTML 中）
+*.jpg
+*.jpg.b64
+
+# Python
+__pycache__/
+*.pyc
+
+# 系统
+.DS_Store
+Thumbs.db

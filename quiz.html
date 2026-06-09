@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>前端期末复习刷题</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    min-height: 100vh;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 12px; }
+
+  /* ===== 头部 ===== */
+  .header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; }
+  .header h1 { font-size: 18px; font-weight: 700; }
+  .header .stats { display: flex; gap: 8px; font-size: 13px; }
+  .header .stats span { background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px; }
+  .header .stats .stat-correct { color: #81c784; }
+  .header .stats .stat-wrong { color: #ef9a9a; }
+
+  /* ===== 进度条 ===== */
+  .progress-wrap { height: 6px; background: #e0e0e0; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 10px; transition: width 0.3s; }
+
+  /* ===== 模式/筛选 Tabs ===== */
+  .tab-bar {
+    display: flex; gap: 4px; background: #e0e0e0; border-radius: 10px; padding: 3px; margin-bottom: 8px;
+  }
+  .tab-bar .tab {
+    flex: 1; padding: 6px 8px; border: none; border-radius: 8px;
+    background: transparent; cursor: pointer; font-size: 13px; font-weight: 600;
+    transition: all 0.2s; text-align: center; color: #666;
+  }
+  .tab-bar .tab.active { background: #fff; color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .tab-bar .tab .badge { font-size: 10px; background: #f44336; color: #fff; border-radius: 10px; padding: 0 6px; margin-left: 2px; }
+
+  /* ===== 题型筛选 ===== */
+  .filter-bar {
+    display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .filter-chip {
+    padding: 4px 12px; border-radius: 20px; border: 1.5px solid #ddd;
+    background: #fff; cursor: pointer; font-size: 12px; font-weight: 500;
+    transition: all 0.2s; color: #666;
+  }
+  .filter-chip:hover { border-color: #667eea; }
+  .filter-chip.active { border-color: #667eea; background: #eef0ff; color: #667eea; }
+
+  /* ===== 题目卡片 ===== */
+  .question-card {
+    background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .q-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;
+  }
+  .q-number { font-size: 15px; font-weight: 700; color: #667eea; }
+  .q-type {
+    font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600;
+    background: #e8eaf6; color: #5c6bc0;
+  }
+  .q-type.tf { background: #fff3e0; color: #ef6c00; }
+  .q-type.fill { background: #e0f2f1; color: #00897b; }
+  .q-type.code { background: #fce4ec; color: #c62828; }
+  .q-type.essay { background: #f3e5f5; color: #7b1fa2; }
+
+  /* ===== 原图折叠 ===== */
+  .q-image-collapse { margin-bottom: 6px; }
+  .img-toggle {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+    border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;
+    cursor: pointer; font-size: 11px; color: #888; transition: all 0.2s;
+  }
+  .img-toggle:hover { background: #eee; color: #555; }
+  .img-toggle.open { background: #eef0ff; border-color: #667eea; color: #667eea; }
+  .q-image-wrap { border-radius: 8px; overflow: hidden; background: #fafafa; border: 1px solid #eee; margin-top: 4px; }
+  .q-image-wrap img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+  .q-image-wrap img.zoomed { cursor: zoom-out; transform: scale(1.8); transform-origin: top left; }
+  .zoom-hint { text-align: center; font-size: 11px; color: #999; padding: 3px; background: #fafafa; border-top: 1px solid #eee; }
+
+  /* ===== 题目文字 ===== */
+  .q-text {
+    font-size: 15px; line-height: 1.7; margin-bottom: 12px;
+    padding: 10px 14px; background: #f8f9ff; border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+  .q-text.code-block { font-family: "Cascadia Code", "Fira Code", monospace; font-size: 14px; white-space: pre-line; }
+
+  /* ===== 选择题选项 ===== */
+  .options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .option-btn {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+    border: 2px solid #e0e0e0; border-radius: 10px; background: #fff;
+    cursor: pointer; font-size: 14px; transition: all 0.2s; text-align: left;
+  }
+  .option-btn:hover { border-color: #667eea; background: #f8f9ff; }
+  .option-btn .label {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%; background: #f0f0f0;
+    font-weight: 700; font-size: 12px; flex-shrink: 0;
+  }
+  .option-btn.selected .label { background: #667eea; color: #fff; }
+  .option-btn.correct { border-color: #4caf50; background: #e8f5e9; }
+  .option-btn.correct .label { background: #4caf50; color: #fff; }
+  .option-btn.wrong { border-color: #f44336; background: #ffebee; }
+  .option-btn.wrong .label { background: #f44336; color: #fff; }
+
+  /* ===== 判断题 ===== */
+  .tf-options { display: flex; gap: 10px; margin-bottom: 10px; }
+  .tf-btn {
+    flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px;
+    background: #fff; cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.2s; text-align: center;
+  }
+  .tf-btn.sel-t { border-color: #4caf50; background: #e8f5e9; color: #2e7d32; }
+  .tf-btn.sel-f { border-color: #f44336; background: #ffebee; color: #c62828; }
+
+  /* ===== 输入框 ===== */
+  .input-area { margin-bottom: 10px; }
+  .input-area textarea {
+    width: 100%; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 10px;
+    font-size: 14px; font-family: inherit; resize: vertical; min-height: 44px; transition: border-color 0.2s;
+  }
+  .input-area textarea:focus { outline: none; border-color: #667eea; }
+  .input-area textarea.ok { border-color: #4caf50; background: #e8f5e9; }
+  .input-area textarea.no { border-color: #f44336; background: #ffebee; }
+
+  /* ===== 按钮 ===== */
+  .btn-group { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .btn {
+    padding: 8px 20px; border: none; border-radius: 8px; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: #667eea; color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #5a6fd6; }
+  .btn-success { background: #4caf50; color: #fff; }
+  .btn-success:hover:not(:disabled) { background: #43a047; }
+  .btn-outline { background: transparent; border: 2px solid #667eea; color: #667eea; }
+  .btn-danger { background: #f44336; color: #fff; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* ===== 反馈区 ===== */
+  .feedback {
+    padding: 10px 14px; border-radius: 8px; margin-top: 8px;
+    font-size: 14px; line-height: 1.6; display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #e8f5e9; border: 1px solid #c8e6c9; color: #2e7d32; }
+  .feedback.no { background: #ffebee; border: 1px solid #ffcdd2; color: #c62828; }
+  .feedback .detail { margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(0,0,0,0.1); font-size: 13px; }
+
+  /* ===== 答题卡 ===== */
+  .nav-grid { display: flex; flex-wrap: wrap; gap: 5px; padding: 8px 0; }
+  .nav-dot {
+    width: 30px; height: 30px; border-radius: 6px;
+    border: 2px solid #e0e0e0; background: #fff; cursor: pointer;
+    font-size: 11px; font-weight: 600; display: flex; align-items: center;
+    justify-content: center; transition: all 0.2s;
+  }
+  .nav-dot.cur { border-color: #667eea; background: #667eea; color: #fff; }
+  .nav-dot.done { border-color: #4caf50; background: #e8f5e9; }
+  .nav-dot.done.cur { background: #4caf50; color: #fff; }
+  .nav-dot.err { border-color: #f44336; background: #ffebee; }
+  .nav-dot.err.cur { background: #f44336; color: #fff; }
+  .nav-dot.skipped { border-color: #ff9800; background: #fff3e0; }
+
+  /* ===== 测验模式相关 ===== */
+  .quiz-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; background: #fff3e0; border-radius: 8px; margin-bottom: 10px;
+    font-size: 13px; font-weight: 600; color: #ef6c00;
+  }
+  .quiz-bar .timer { font-family: "Cascadia Code", monospace; font-size: 18px; letter-spacing: 1px; }
+  .quiz-bar .timer.urgent { color: #f44336; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  /* ===== 结果面板 ===== */
+  .result-panel {
+    display: none; text-align: center; padding: 30px 16px;
+  }
+  .result-panel.show { display: block; }
+  .result-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; margin: 0 auto 16px; color: #fff;
+  }
+  .result-circle .num { font-size: 40px; font-weight: 700; }
+  .result-circle .den { font-size: 16px; opacity: 0.9; }
+
+  /* ===== 阅读模式 ===== */
+  .review-item {
+    padding: 16px; border: 1px solid #e0e0e0; border-radius: 10px;
+    margin-bottom: 10px; background: #fff;
+  }
+  .review-item .ri-q { font-weight: 600; margin-bottom: 6px; }
+  .review-item .ri-answer { color: #4caf50; font-weight: 500; }
+  .review-item .ri-explain {
+    margin-top: 6px; padding: 8px 12px; background: #f5f5f5;
+    border-radius: 6px; font-size: 13px; line-height: 1.6; color: #555;
+  }
+
+  /* ===== 测验结果明细 ===== */
+  .quiz-result-detail { text-align: left; margin-top: 16px; }
+  .qr-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 6px; margin-bottom: 4px; font-size: 13px;
+  }
+  .qr-item.qr-ok { background: #e8f5e9; }
+  .qr-item.qr-no { background: #ffebee; }
+  .qr-item .qr-num { font-weight: 700; min-width: 40px; }
+  .qr-item .qr-icon { font-size: 16px; }
+
+  /* ===== 错题本 ===== */
+  .wrong-list { margin-top: 8px; }
+  .wrong-item {
+    padding: 12px 14px; border: 1px solid #ffcdd2; border-radius: 8px;
+    margin-bottom: 8px; background: #fff; font-size: 14px; line-height: 1.5;
+  }
+  .wrong-item .wi-q { font-weight: 600; margin-bottom: 4px; }
+  .wrong-item .wi-yours { color: #f44336; }
+  .wrong-item .wi-right { color: #4caf50; }
+
+  /* ===== 隐藏 ===== */
+  .hidden { display: none !important; }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 600px) {
+    .container { padding: 8px; }
+    .header h1 { font-size: 15px; }
+    .tab-bar .tab { font-size: 12px; padding: 5px 6px; }
+    .q-text { font-size: 14px; padding: 8px 10px; }
+    .option-btn { padding: 8px 10px; font-size: 13px; }
+    .tf-btn { padding: 10px; font-size: 14px; }
+    .btn { padding: 7px 14px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- 头部 -->
+  <div class="header">
+    <div class="header-top">
+      <h1>📚 前端期末复习</h1>
+      <div class="stats">
+        <span class="stat-correct">✅ <span id="hCorr">0</span></span>
+        <span class="stat-wrong">❌ <span id="hWrong">0</span></span>
+        <span>📊 <span id="hProg">0/0</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progBar"></div></div>
+
+  <!-- 模式 Tab -->
+  <div class="tab-bar" id="modeTabs">
+    <button class="tab active" data-mode="practice" onclick="setMode('practice')">📝 刷题</button>
+    <button class="tab" data-mode="quiz" onclick="setMode('quiz')">📋 测验</button>
+    <button class="tab" data-mode="review" onclick="setMode('review')">📖 阅读</button>
+    <button class="tab" data-mode="nav" onclick="setMode('nav')">🗂️ 答题卡 <span class="badge" id="wrongBadge">0</span></button>
+  </div>
+
+  <!-- 题型筛选 -->
+  <div class="filter-bar" id="filterBar">
+    <span class="filter-chip active" data-filter="all" onclick="setFilter('all')">全部 (60)</span>
+    <span class="filter-chip" data-filter="choice" onclick="setFilter('choice')">选择题</span>
+    <span class="filter-chip" data-filter="truefalse" onclick="setFilter('truefalse')">判断题</span>
+    <span class="filter-chip" data-filter="fill" onclick="setFilter('fill')">填空题</span>
+    <span class="filter-chip" data-filter="code" onclick="setFilter('code')">编程题</span>
+  </div>
+
+  <!-- 测验栏（仅测验模式显示） -->
+  <div class="quiz-bar hidden" id="quizBar">
+    <span>⏱️ <span class="timer" id="quizTimer">00:00</span></span>
+    <span>📊 <span id="quizProg">0/0</span></span>
+    <button class="btn btn-sm btn-danger" onclick="endQuiz()">🚫 交卷</button>
+  </div>
+
+  <!-- ===== 刷题/测验模式 ===== -->
+  <div id="panelPractice">
+    <div class="question-card" id="qCard">
+      <div class="q-header">
+        <span class="q-number" id="qNum"></span>
+        <span class="q-type" id="qTypeLabel"></span>
+      </div>
+      <!-- 原图折叠 -->
+      <div class="q-image-collapse">
+        <button class="img-toggle" onclick="toggleImg()">📷 查看原图</button>
+        <div class="q-image-wrap hidden" id="qImgWrap">
+          <img id="qImg" src="" alt="原题图片" onclick="toggleZoom(this)">
+          <div class="zoom-hint">👆 点击放大</div>
+        </div>
+      </div>
+      <!-- 题目文字 -->
+      <div class="q-text" id="qText"></div>
+      <!-- 答案区 -->
+      <div class="options hidden" id="optArea"></div>
+      <div class="tf-options hidden" id="tfArea"></div>
+      <div class="input-area hidden" id="inpArea"><textarea id="inpAns" rows="2" placeholder="请输入答案..."></textarea></div>
+      <!-- 反馈 -->
+      <div class="feedback" id="fb"></div>
+      <!-- 按钮 -->
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btnSubmit" onclick="submitAns()">✅ 提交</button>
+        <button class="btn btn-success hidden" id="btnNext" onclick="nextQ()">➡️ 下一题</button>
+        <button class="btn btn-outline btn-sm hidden" id="btnShowAns" onclick="showAns()">💡 答案</button>
+        <button class="btn btn-outline btn-sm hidden" id="btnSkip" onclick="skipQ()">⏭️ 跳过</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 阅读模式 ===== -->
+  <div id="panelReview" class="hidden"></div>
+
+  <!-- ===== 答题卡 ===== -->
+  <div id="panelNav" class="hidden">
+    <div class="question-card">
+      <p style="color:#888;font-size:13px;margin-bottom:6px;">🟢 已答 &nbsp;🔴 错题 &nbsp;🟣 当前 &nbsp;⚪ 未答</p>
+      <div class="nav-grid" id="navGrid"></div>
+    </div>
+  </div>
+
+  <!-- ===== 结果面板 ===== -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-circle"><div class="num" id="rScore">0</div><div class="den" id="rTotal">/0</div></div>
+    <h2 id="rTitle">🎉</h2>
+    <p id="rMsg" style="color:#888;margin-bottom:12px;"></p>
+    <div id="rExtra" class="quiz-result-detail"></div>
+    <div class="btn-group" style="justify-content:center;">
+      <button class="btn btn-primary" onclick="resetAll()">🔄 再来一次</button>
+      <button class="btn btn-outline" onclick="setMode('nav')">📕 查看错题</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== 题库 ====================
+const QUESTIONS = [
+  { id:1, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'以下哪个不是前端Web开发技术？',
+    opts:['HTML','CSS','JavaScript','MySQL'], ans:3,
+    exp:'MySQL 是数据库管理系统，属于后端技术。前端三剑客：HTML（结构）、CSS（样式）、JavaScript（行为）。' },
+  { id:2, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'HTML 的英文全称是 HyperText Markup Language，其中文含义是？',
+    opts:['超文本标记语言','标准通用标记语言','可扩展标记语言','通用标记语言'], ans:0,
+    exp:'HTML = HyperText Markup Language = 超文本标记语言。HyperText 指超文本（包含链接的文本），Markup 指用标签标记内容。' },
+  { id:3, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'&lt;img&gt; 标签中用于设置替代文本的属性是？',
+    opts:['alt','src','title','width'], ans:0,
+    exp:'alt 属性提供替代文本，图片加载失败时显示；同时有助于 SEO 和无障碍访问（屏幕阅读器会读取 alt 内容）。src 指定图片路径，title 提供悬停提示。' },
+  { id:4, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'以下哪个不是 HTML 标题标签？',
+    opts:['&lt;h6&gt;','&lt;hb&gt;','&lt;title&gt;','&lt;head&gt;'], ans:1,
+    exp:'&lt;hb&gt; 不是 HTML 标准标签。HTML 标题标签为 &lt;h1&gt;~&lt;h6&gt;。&lt;title&gt; 定义页面标题（显示在标签栏），&lt;head&gt; 是文档头部容器。' },
+  { id:5, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'以下哪个标签用于定义表格的行？',
+    opts:['&lt;td&gt;','&lt;th&gt;','&lt;tr&gt;','&lt;table&gt;'], ans:2,
+    exp:'tr = Table Row（表格行），td = Table Data（单元格），th = Table Header（表头单元格），table = 表格容器。' },
+  { id:6, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'以下哪个不是 CSS 背景相关属性？（请对照原题图片确认）',
+    opts:['background-color','background-image','background-position','background-repeat'], ans:-1,
+    exp:'这四个都是合法的 CSS 背景属性。background-color（背景色）、background-image（背景图）、background-position（位置）、background-repeat（重复方式）。如果题目是"以下哪个不是"，则无正确答案。请对照原图确认题目问法。' },
+  { id:7, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'CSS 中正确的注释写法是？',
+    opts:['// 注释','/* 注释 */','&lt;!-- 注释 --&gt;','# 注释'], ans:1,
+    exp:'CSS 使用 /* ... */ 作为注释。// 是 JavaScript/SCSS 的单行注释，&lt;!-- --&gt; 是 HTML 注释。# 在 CSS 中是 id 选择器前缀。' },
+  { id:8, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'CSS 后代选择器（Descendant Selector）使用什么符号？',
+    opts:['>','+','空格','~'], ans:2,
+    exp:'空格表示后代选择器（如 div p 选 div 内所有 p）。> 子元素选择器、+ 相邻兄弟选择器、~ 通用兄弟选择器。' },
+  { id:9, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'CSS 中设置字体颜色使用哪个属性？',
+    opts:['font-color','color','text-color','fgcolor'], ans:1,
+    exp:'color 属性设置文本颜色（前景色）。其他选项都不是标准 CSS 属性。font-size 设字号，font-weight 设粗细。' },
+  { id:10, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'CSS 中设置字体粗细使用哪个属性？',
+    opts:['font-weight','bold','text-bold','weight'], ans:0,
+    exp:'font-weight 设置字体粗细。取值：normal(400)、bold(700)、lighter、bolder 或数字 100-900。bold 是值而非属性名。' },
+  { id:11, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'以下哪个元素的内容不会在浏览器页面中直接显示？',
+    opts:['&lt;title&gt;','&lt;head&gt;','&lt;body&gt;','&lt;html&gt;'], ans:1,
+    exp:'&lt;head&gt; 存放元数据（meta、title、style、link 等），其内容不在页面中渲染。&lt;title&gt; 显示在浏览器标签页上。&lt;body&gt; 内容是页面主体。' },
+  { id:12, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'设置 margin 上10px、右20px、下30px、左40px，正确的是？',
+    opts:['margin:10px 20px 30px 40px','margin:10px 30px','margin:10px','margin:10px 20px 30px'], ans:0,
+    exp:'margin 缩写顺序：上 右 下 左（顺时针）。若只写两个值：上下、左右。一个值：四边统一。' },
+  { id:13, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'CSS 中哪种定位方式相对于最近的已定位祖先元素？',
+    opts:['position:relative','position:absolute','position:fixed','position:static'], ans:1,
+    exp:'absolute 相对于最近的 position 非 static 的祖先元素定位。relative 相对于自身原始位置，fixed 相对于视口，static 是默认值。' },
+  { id:14, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'以下哪个不是 JavaScript 的基本数据类型？',
+    opts:['Number','String','Boolean','Float'], ans:3,
+    exp:'JS 基本类型（7种）：Number、String、Boolean、Null、Undefined、Symbol、BigInt。没有 Float 类型，数字统一用 Number。' },
+  { id:15, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'JavaScript 中用于声明变量的关键字是？',
+    opts:['var','int','float','char'], ans:0,
+    exp:'JS 声明变量用 var、let、const。int、float、char 是 Java/C 等静态类型语言的关键字。ES6 推荐优先用 const，其次 let。' },
+  { id:16, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'HTML 表格中合并列使用的属性是？',
+    opts:['colspan','rowspan','cellpadding','cellspacing'], ans:0,
+    exp:'colspan="n" 合并 n 列，rowspan="n" 合并 n 行。cellpadding 是单元格内边距，cellspacing 是单元格间距（这两个在 HTML5 中已废弃，推荐用 CSS）。' },
+  { id:17, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'以下哪个不是 &lt;input&gt; 的 type 属性值？（请对照原题确认）',
+    opts:['button','submit','reset','image'], ans:-1,
+    exp:'button、submit、reset、image 都是 HTML 标准中有效的 &lt;input type&gt; 值。其中 image 是一种图形化提交按钮。请对照原图确认题目问法。' },
+  { id:18, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'CSS 中 id 选择器使用什么符号？',
+    opts:['#','.','&','*'], ans:0,
+    exp:'#id 选择特定 id 的元素，.class 选择特定 class 的元素，* 通用选择器（选所有元素）。id 在页面中唯一，class 可重复使用。' },
+  { id:19, type:'choice', img:'7adf4b91e0bb47044fcfcfd084673209.jpg',
+    text:'SEO 是什么的缩写？',
+    opts:['Search Engine Optimization','Social Engagement Output','Server End Operation','Standard Element Object'], ans:0,
+    exp:'SEO = Search Engine Optimization（搜索引擎优化）。通过优化网站结构和内容提升在搜索引擎中的排名。' },
+  // ---- 图片2：选择题 20-30 ----
+  { id:20, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'&lt;img&gt; 标签中 alt 属性的主要作用是？',
+    opts:['图片无法显示时展示替代文本','设置图片的提示文字','定义图片路径','设置图片尺寸'], ans:0,
+    exp:'alt 提供替代文本，图片加载失败时显示；屏幕阅读器读取 alt 帮助视障用户；搜索引擎抓取 alt 了解图片内容。' },
+  { id:21, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'在 HTML 中引用外部 CSS 文件最常用的方式是？',
+    opts:['&lt;link&gt; 标签','&lt;style&gt; 标签','@import 语句','行内 style 属性'], ans:0,
+    exp:'&lt;link rel="stylesheet" href="style.css"&gt; 是最常用的方式。&lt;style&gt; 用于嵌入 CSS，@import 也可引入但不推荐（阻塞渲染）。' },
+  { id:22, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'&lt;a&gt; 标签中指定链接目标地址的属性是？',
+    opts:['src','target','href','alt'], ans:2,
+    exp:'href（Hypertext Reference）指定链接 URL。target 指定打开方式（_blank 新窗口）。src 用于 img/script/iframe。' },
+  { id:23, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'关于 CSS float 属性，以下说法错误的是？',
+    opts:['float 可使元素脱离文档流','float 值包括 left、right、center','浮动元素导致父元素高度塌陷','clear 可清除浮动'], ans:1,
+    exp:'float 取值：left（左浮动）、right（右浮动）、none（不浮动）。没有 center 值。清除浮动常用 clear:both 或 overflow:hidden。' },
+  { id:24, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'设置 CSS 边框时，以下哪个属性是必须的才能显示边框？',
+    opts:['border-width','border-color','border-style','border-radius'], ans:2,
+    exp:'border-style 必须设置（如 solid、dashed、dotted 等），默认值为 none（不显示边框）。width 和 color 有默认值但仍需 style 配合。' },
+  { id:25, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'以下哪个 CSS 颜色写法是错误的？',
+    opts:['p{color:#F00}','p{color:rgba(255,0,0,1)}','p{color:rgb(255,0,0)}','p{color:rgb(F,0,0)}'], ans:3,
+    exp:'rgb() 的参数必须是数值（0-255）或百分比。rgb(F,0,0) 语法错误。#F00 是 #FF0000 的简写，rgba() 支持透明度。' },
+  { id:26, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'以下哪个值不能用于 padding 属性？',
+    opts:['10px','5%','auto','1em'], ans:2,
+    exp:'padding 不支持 auto 值。auto 可用于 margin（如 margin:0 auto 水平居中）。padding 支持 px、%、em、rem 等单位。' },
+  { id:27, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'以下哪个不是 CSS transform 可实现的变换？',
+    opts:['平移 translate','缩放 scale','旋转 rotate','模糊 blur'], ans:3,
+    exp:'blur（模糊）是 filter 属性的值（filter:blur(5px)）。transform 的变换函数：translate()、scale()、rotate()、skew()。' },
+  { id:28, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'使元素既可设宽高又可并排显示，display 应设为？',
+    opts:['inline','block','flex','inline-block'], ans:3,
+    exp:'inline-block 兼具行内（不换行）和块级（可设宽高）特性。inline 不能设宽高，block 独占一行，flex 是弹性盒布局。' },
+  { id:29, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'以下哪种方式隐藏元素后不占据页面空间？',
+    opts:['opacity:0','visibility:hidden','display:none','z-index:-1'], ans:2,
+    exp:'display:none 彻底移除元素（不占空间）。visibility:hidden 隐藏但仍占位。opacity:0 透明但仍可交互。z-index 控制层叠顺序。' },
+  { id:30, type:'choice', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'设置元素透明度的属性是？',
+    opts:['opacity','visibility','display','z-index'], ans:0,
+    exp:'opacity:0~1 设置透明度（0 完全透明，1 完全不透明）。visibility 控制显隐，display 控制布局行为，z-index 控制层序。' },
+  // ---- 判断题 ----
+  { id:31, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'&lt;head&gt; 中的 CSS 样式对整个页面可见。', ans:true,
+    exp:'正确。&lt;head&gt; 中的 &lt;style&gt; 定义的 CSS 全局作用于当前整个页面。' },
+  { id:32, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'W3C 是制定 Web 标准的国际组织。', ans:true,
+    exp:'正确。W3C（World Wide Web Consortium，万维网联盟）负责制定 HTML、CSS、XML 等 Web 标准。' },
+  { id:33, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'CSS 中某些属性（如 color、font-family）可以被子元素继承。', ans:true,
+    exp:'正确。文字相关属性（color、font-family、font-size、line-height 等）默认可继承。盒模型属性（margin、padding、border）不继承。' },
+  { id:34, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'后代选择器（Descendant Selector）使用空格分隔选择器。', ans:true,
+    exp:'正确。例如 div p 选择 div 内的所有 p 元素（不限层级），空格表示后代关系。' },
+  { id:35, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'&lt;h1&gt; 到 &lt;h6&gt; 表示不同级别标题，&lt;h1&gt; 级别最高。', ans:true,
+    exp:'正确。&lt;h1&gt;（最重要）到 &lt;h6&gt;（最不重要），数字越小级别越高，字号通常越大。' },
+  { id:36, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'Web 标准由结构（HTML）、表现（CSS）、行为（JavaScript）三层组成。', ans:true,
+    exp:'正确。Web 标准倡导结构、表现、行为相分离，分别由 HTML、CSS、JavaScript 实现。' },
+  { id:37, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'有序列表应使用 &lt;ol&gt; 标签。', ans:true,
+    exp:'正确。ol = Ordered List（有序列表），默认显示数字序号。ul = Unordered List（无序列表），默认显示圆点。' },
+  { id:38, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'JavaScript 是 Java 语言的简化版本。', ans:false,
+    exp:'错误。JavaScript 和 Java 是完全不同的语言，只是名字相似。JS 由 Brendan Eich 在 Netscape 开发，最初叫 LiveScript。' },
+  { id:39, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'clear 属性用于清除 float 浮动带来的影响。', ans:true,
+    exp:'正确。clear:left 清除左浮动影响，clear:right 清除右浮动，clear:both 清除两侧。常用 clearfix 方案处理父元素塌陷。' },
+  { id:40, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'CSS 中 id 选择器用 # 号，class 选择器用 . 号。', ans:true,
+    exp:'正确。#id 选中特定 id 元素（唯一）。.class 选中所有具有该 class 的元素（可重复）。' },
+  { id:41, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'line-height 属性用于设置文本的行高。', ans:true,
+    exp:'正确。line-height 设置行高，影响行与行之间的垂直间距。常用值：1.5（相对字号）、24px（固定值）、150%（百分比）。' },
+  { id:42, type:'truefalse', img:'7e737bfc9b122b5fe2bb12bd090623c9.jpg',
+    text:'&lt;head&gt; 标签中可以存放 &lt;title&gt;、&lt;meta&gt;、&lt;style&gt; 等元素。', ans:true,
+    exp:'正确。&lt;head&gt; 是文档元数据容器，包含 title（标题）、meta（字符编码/描述等）、style（CSS）、link（外部资源）等。' },
+  // ---- 填空题 ----
+  { id:43, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'在 HTML 中，&lt;meta charset="____"&gt; 用于设置字符编码。',
+    ans:['utf-8','utf8','UTF-8','UTF8'],
+    exp:'最常用的字符编码是 UTF-8（Unicode 编码），支持全球几乎所有字符。设置位置：&lt;meta charset="UTF-8"&gt; 放在 &lt;head&gt; 中。' },
+  { id:44, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'Web 三层标准：结构对应 HTML，表现对应 CSS，行为对应＿＿。',
+    ans:['javascript','JavaScript','JS','js'],
+    exp:'Web 三层架构：结构层（HTML 负责内容和结构）、表现层（CSS 负责样式和布局）、行为层（JavaScript 负责交互和功能）。' },
+  { id:45, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'CSS 中设置元素不显示且不占空间的 display 值是＿＿。',
+    ans:['none'],
+    exp:'display:none 隐藏元素且不占据页面空间，元素从文档流中完全移除。与之对比：visibility:hidden 隐藏但保留占位。' },
+  { id:46, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'CSS 盒模型（Box Model）由 margin、border、padding 和＿＿组成。',
+    ans:['content','内容','content区域'],
+    exp:'盒模型从外到内：margin（外边距）→ border（边框）→ padding（内边距）→ content（内容区域）。总宽度 = margin + border + padding + content。' },
+  { id:47, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'CSS 伪元素 ::before 和 ::after 必须配合＿＿属性使用。',
+    ans:['content'],
+    exp:'::before 和 ::after 必须设置 content 属性才能生效（即使为空字符串 content:""）。它们分别在元素内容的前后插入生成内容。' },
+  { id:48, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'颜色值 #336699 的简写形式是＿＿。',
+    ans:['#369'],
+    exp:'六位十六进制颜色每两位相同时可简写为三位：#336699 → #369，#FF0000 → #F00，#AABBCC → #ABC。' },
+  { id:49, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'CSS 选择器优先级：!important > 行内样式 > ＿＿选择器 > class选择器 > 标签选择器。',
+    ans:['id','ID'],
+    exp:'CSS 优先级（从高到低）：!important > 行内样式（内联 style）> id 选择器（#）> class/属性/伪类选择器（. / [] / :）> 标签/伪元素选择器（div / ::before）。' },
+  { id:50, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'CSS3 中控制元素尺寸计算方式的属性是＿＿-＿＿。',
+    ans:['box-sizing','boxsizing'],
+    exp:'box-sizing 有两个值：content-box（默认，宽高只算内容区，padding+border 在外）和 border-box（宽高包含 padding+border，更直观）。' },
+  { id:51, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'Flexbox 布局通过设置 display:＿＿ 来启用弹性盒模型。',
+    ans:['flex'],
+    exp:'display:flex 启用弹性盒布局，容器称为 flex container，子元素自动成为 flex item。flex 布局让水平垂直居中、等分排列变得简单。' },
+  { id:52, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'JavaScript 中使用＿＿关键字声明常量（值不可重新赋值）。',
+    ans:['const'],
+    exp:'const 声明常量，一旦赋值不可重新绑定。let 声明可变变量（块级作用域），var 声明变量（函数级作用域）。ES6 推荐优先使用 const。' },
+  { id:53, type:'fill', img:'af3a4711726466fb737a31e5af218583.jpg',
+    text:'&lt;input type="＿＿"&gt; 创建提交按钮，点击后提交表单。',
+    ans:['submit'],
+    exp:'type="submit" 创建表单提交按钮，点击后触发表单提交。type="reset" 重置表单，type="button" 普通按钮（需绑定 JS）。' },
+  // ---- 编程题 ----
+  { id:54, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
+    text:'求值：\nvar a = 9;\nvar b = (--a) + (a--);\n请问 b 的值是多少？',
+    ans:['16'],
+    exp:'详细过程：\n1. --a：前缀递减，a 先减1变成 8，表达式返回 8\n2. a--：后缀递减，表达式先返回 a 当前值（8），然后 a 减1变成 7\n3. b = 8 + 8 = 16\n关键：前缀先变后用，后缀先用后变。' },
+  { id:55, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
+    text:'求值：\nvar m = 7;\nm *= 3 + 2;\n请问 m 的值是多少？',
+    ans:['35'],
+    exp:'详细过程：\n1. 复合赋值运算符 *= 优先级低于 +（加法）\n2. 先算 3 + 2 = 5\n3. m = m * 5 = 7 * 5 = 35\n注意：*= 相当于 m = m * (右侧整体表达式)。' },
+  { id:56, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
+    text:'求值：\nlet s = 0;\nfor(let i=2; i<=10; i+=2) {\n  s += i;\n}\nconsole.log(s);\n输出结果是什么？',
+    ans:['30'],
+    exp:'详细过程：\n循环 i 从 2 到 10，步长为 2（即 2,4,6,8,10）\ns = 0+2 = 2\ns = 2+4 = 6\ns = 6+6 = 12\ns = 12+8 = 20\ns = 20+10 = 30\n最终 s = 30' },
+  { id:57, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
+    text:'CSS 盒模型计算：\ndiv 样式如下（标准盒模型 content-box）：\nwidth:200px; padding:10px; border:5px solid #000;\n请问该 div 实际总宽度是多少 px？',
+    ans:['230','230px'],
+    exp:'content-box 模式下：总宽度 = width + padding×2 + border×2\n= 200 + 10×2 + 5×2\n= 200 + 20 + 10\n= 230px' },
+  { id:58, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
+    text:'CSS 盒模型计算：\ndiv 样式如下（border-box）：\nwidth:200px; padding:10px; border:5px solid #000;\n请问该 div 实际总宽度是多少 px？',
+    ans:['200','200px'],
+    exp:'border-box 模式下，width 已经包含了 padding 和 border。\n总宽度就是声明的 200px\n内容区实际宽度 = 200 - 10×2 - 5×2 = 170px' },
+  { id:59, type:'code', img:'db0d8116f116f331d32646467101eef7.jpg',
+    text:'CSS 盒模型计算：\ndiv 样式如下（border-box）：\nwidth:220px; padding:10px 20px; border:4px solid #000;\n请问总宽度和内容区宽度分别是多少 px？（逗号分隔，如 220,172）',
+    ans:['220,172','220,172px'],
+    exp:'border-box 模式下：\n总宽度 = 220px（声明值）\npadding 左右各 20px = 40px\nborder 左右各 4px = 8px\n内容区 = 220 - 40 - 8 = 172px' },
+  // ---- 简答题 ----
+  { id:60, type:'essay', img:'db0d8116f116f331d32646467101eef7.jpg',
+    text:'请简述如何在 HTML/CSS 中实现背景图片（images/dot.gif）平铺且不随滚动滚动的效果。',
+    ans:['background'],
+    exp:'参考答案：\n1. 设置背景图片：background-image: url("images/dot.gif");\n2. 禁止平铺：background-repeat: no-repeat;\n3. 固定背景不滚动：background-attachment: fixed;\n简写：background: url("images/dot.gif") no-repeat fixed;\n注意：fixed 使背景相对于视口固定，滚动页面时背景不动。' },
+];
+
+// ==================== 状态 ====================
+let state = {
+  mode: 'practice',  // practice | quiz | review | nav
+  filter: 'all',
+  curIdx: 0,
+  answers: {},       // { id: value }
+  results: {},       // { id: true/false }
+  answered: new Set(),
+  wrong: new Set(),
+  submitted: false,
+
+  // quiz mode
+  quizActive: false,
+  quizStart: null,
+  quizTimer: null,
+  quizElapsed: 0,
+  quizOrder: [],        // 测验题目顺序
+  quizIdx: 0,
+};
+
+// ==================== 工具函数 ====================
+function getFiltered() {
+  return QUESTIONS.filter(q => state.filter === 'all' || q.type === state.filter);
+}
+
+function getCur() { return getFiltered()[state.curIdx]; }
+
+function qById(id) { return QUESTIONS.find(q => q.id === id); }
+
+// ==================== 模式切换 ====================
+function setMode(m) {
+  if (state.mode === 'quiz' && state.quizActive && m !== 'quiz') {
+    if (!confirm('测验进行中，确定退出？')) return;
+    endQuiz();
+  }
+  state.mode = m;
+  document.querySelectorAll('#modeTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.mode === m));
+  document.getElementById('panelPractice').classList.add('hidden');
+  document.getElementById('panelReview').classList.add('hidden');
+  document.getElementById('panelNav').classList.add('hidden');
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('quizBar').classList.add('hidden');
+
+  if (m === 'practice') { document.getElementById('panelPractice').classList.remove('hidden'); renderQ(); }
+  else if (m === 'quiz') { startQuiz(); }
+  else if (m === 'review') { document.getElementById('panelReview').classList.remove('hidden'); renderReview(); }
+  else if (m === 'nav') { document.getElementById('panelNav').classList.remove('hidden'); renderNav(); }
+}
+
+function setFilter(f) {
+  state.filter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
+  // Update counts
+  const total = QUESTIONS.length;
+  document.querySelector('.filter-chip[data-filter="all"]').textContent = `全部 (${total})`;
+  ['choice','truefalse','fill','code'].forEach(t => {
+    const count = QUESTIONS.filter(q => q.type === t).length;
+    const el = document.querySelector(`.filter-chip[data-filter="${t}"]`);
+    if (el) el.textContent = {choice:'选择题',truefalse:'判断题',fill:'填空题',code:'编程题'}[t] + ` (${count})`;
+  });
+  if (state.mode === 'practice' || state.mode === 'review') { state.curIdx = 0; renderQ(); }
+}
+
+// ==================== 渲染题目 ====================
+function renderQ() {
+  const q = getCur();
+  if (!q) { document.getElementById('qNum').textContent = '无题目'; return; }
+
+  state.submitted = false;
+  // 折叠原图
+  document.getElementById('qImgWrap').classList.add('hidden');
+  const imgBtn = document.querySelector('.img-toggle');
+  imgBtn.classList.remove('open'); imgBtn.textContent = '📷 查看原图';
+
+  // 题号与类型
+  const filtered = getFiltered();
+  const globalNum = q.id;
+  const typeName = {choice:'选择题',truefalse:'判断题',fill:'填空题',code:'编程题',essay:'简答题'}[q.type];
+  document.getElementById('qNum').textContent = `#${globalNum}  (${state.curIdx+1}/${filtered.length})`;
+  const tl = document.getElementById('qTypeLabel');
+  tl.textContent = typeName;
+  tl.className = 'q-type';
+  if (q.type==='truefalse') tl.classList.add('tf');
+  else if (q.type==='fill') tl.classList.add('fill');
+  else if (q.type==='code') tl.classList.add('code');
+  else if (q.type==='essay') tl.classList.add('essay');
+
+  // 图片
+  document.getElementById('qImg').src = q.img;
+
+  // 题目文字
+  const qt = document.getElementById('qText');
+  qt.innerHTML = q.text.replace(/\n/g, '<br>');
+  qt.className = 'q-text' + (q.type==='code'?' code-block':'');
+
+  // 隐藏所有答案区
+  document.getElementById('optArea').classList.add('hidden');
+  document.getElementById('tfArea').classList.add('hidden');
+  document.getElementById('inpArea').classList.add('hidden');
+  document.getElementById('fb').className = 'feedback';
+  document.getElementById('fb').style.display = 'none';
+  document.getElementById('btnSubmit').classList.remove('hidden');
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnSubmit').textContent = '✅ 提交';
+  document.getElementById('btnNext').classList.add('hidden');
+  document.getElementById('btnShowAns').classList.add('hidden');
+  document.getElementById('btnSkip').classList.add('hidden');
+
+  // 跳过按钮仅在测验模式显示
+  if (state.mode === 'quiz') document.getElementById('btnSkip').classList.remove('hidden');
+
+  // 渲染答案区
+  if (q.type === 'choice') renderChoice(q);
+  else if (q.type === 'truefalse') renderTF(q);
+  else renderInput(q);
+
+  // 如果已经答过，恢复
+  if (state.answered.has(q.id)) restoreAns(q);
+
+  updateStats();
+}
+
+function renderChoice(q) {
+  const area = document.getElementById('optArea');
+  area.classList.remove('hidden');
+  area.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  q.opts.forEach((o,i) => {
+    const b = document.createElement('button');
+    b.className = 'option-btn';
+    b.innerHTML = `<span class="label">${labels[i]}</span><span>${o}</span>`;
+    b.dataset.idx = i;
+    b.onclick = () => { if(!state.submitted) { area.querySelectorAll('.option-btn').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); state._sel=i; } };
+    area.appendChild(b);
+  });
+}
+
+function renderTF(q) {
+  const area = document.getElementById('tfArea');
+  area.classList.remove('hidden');
+  area.innerHTML = '';
+  const t = document.createElement('button'); t.className='tf-btn'; t.textContent='✅ 对'; t.onclick=()=>selTF(true);
+  const f = document.createElement('button'); f.className='tf-btn'; f.textContent='❌ 错'; f.onclick=()=>selTF(false);
+  area.append(t,f);
+}
+
+function selTF(v) {
+  if (state.submitted) return;
+  const btns = document.querySelectorAll('.tf-btn');
+  btns.forEach(b=>b.className='tf-btn');
+  if (v) btns[0].classList.add('sel-t'); else btns[1].classList.add('sel-f');
+  state._tf = v;
+}
+
+function renderInput(q) {
+  const area = document.getElementById('inpArea');
+  area.classList.remove('hidden');
+  const ta = document.getElementById('inpAns');
+  ta.value = '';
+  ta.className = '';
+  ta.placeholder = q.type==='code'?'请输入计算结果（数字）...':(q.type==='essay'?'请简述...':'请输入答案...');
+  ta.rows = q.type==='essay' ? 4 : 2;
+}
+
+// ==================== 提交与反馈 ====================
+function getUserAns(q) {
+  if (q.type==='choice') return state._sel!==undefined ? state._sel : null;
+  if (q.type==='truefalse') return state._tf!==undefined ? state._tf : null;
+  return document.getElementById('inpAns').value.trim();
+}
+
+function checkAns(q, ua) {
+  if (q.type==='choice') { if (q.ans<0) return false; return ua===q.ans; }
+  if (q.type==='truefalse') return ua===q.ans;
+  if (q.type==='fill'||q.type==='code') {
+    if (!ua) return false;
+    const n = ua.toLowerCase().replace(/[\s;，。、； ]/g,'');
+    return q.ans.some(a => a.toLowerCase().replace(/[\s;，。、； ]/g,'')===n);
+  }
+  if (q.type==='essay') return q.ans.some(k => ua.includes(k));
+  return false;
+}
+
+function submitAns() {
+  if (state.submitted) return;
+  const q = getCur(); if (!q) return;
+  let ua = getUserAns(q);
+  if (ua===null||ua===undefined||ua==='') { alert('请先作答！'); return; }
+
+  state.submitted = true;
+  state.answers[q.id] = ua;
+  const ok = checkAns(q, ua);
+  state.results[q.id] = ok;
+  state.answered.add(q.id);
+  ok ? state.wrong.delete(q.id) : state.wrong.add(q.id);
+
+  // 显示反馈
+  const fb = document.getElementById('fb');
+  fb.style.display = 'block';
+  fb.className = 'feedback show ' + (ok?'ok':'no');
+  fb.innerHTML = ok ? '✅ <b>正确！</b>' : '❌ <b>错误！</b>' + getRightText(q);
+
+  if (!ok && (q.type==='fill'||q.type==='code')) document.getElementById('inpAns').className = 'no';
+  else if (ok && (q.type==='fill'||q.type==='code')) document.getElementById('inpAns').className = 'ok';
+
+  // 高亮
+  if (q.type==='choice') hlChoice(q, ua);
+  if (q.type==='truefalse') hlTF(q, ua);
+
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').textContent = ok?'✅ 正确':'❌ 错误';
+  document.getElementById('btnNext').classList.remove('hidden');
+
+  const flen = getFiltered().length;
+  if (state.mode === 'quiz') {
+    // 测验模式自动下一题或结束
+    if (state.quizIdx < state.quizOrder.length-1) {
+      // 短暂延迟后自动跳转
+      setTimeout(() => { state.quizIdx++; state.curIdx = state.quizIdx; renderQ(); updateQuizProg(); }, 1200);
+    } else {
+      setTimeout(() => endQuiz(), 1200);
+    }
+  }
+
+  fb.innerHTML += '<div class="detail">💡 ' + q.exp + '</div>';
+  updateStats();
+  document.getElementById('btnShowAns').classList.toggle('hidden', ok);
+}
+
+function getRightText(q) {
+  if (q.type==='choice') {
+    const labels=['A','B','C','D'];
+    return ' 正确答案：'+labels[q.ans]+'. '+q.opts[q.ans];
+  }
+  if (q.type==='truefalse') return ' 正确答案：'+(q.ans?'对':'错');
+  if (q.type==='fill'||q.type==='code') return ' 正确答案：'+q.ans[0];
+  return '';
+}
+
+function showAns() {
+  const q = getCur(); if (!q) return;
+  const fb = document.getElementById('fb');
+  fb.style.display='block'; fb.className='feedback show no';
+  fb.innerHTML = '💡 <b>正确答案：</b>'+getRightText(q)+'<div class="detail">📖 '+q.exp+'</div>';
+  document.getElementById('btnShowAns').classList.add('hidden');
+}
+
+function skipQ() {
+  if (state.mode !== 'quiz') return;
+  state.quizIdx++;
+  state.curIdx = state.quizIdx;
+  renderQ();
+  updateQuizProg();
+}
+
+function nextQ() {
+  const filtered = getFiltered();
+  if (state.mode === 'practice' && state.curIdx < filtered.length-1) {
+    state.curIdx++;
+    renderQ();
+  }
+}
+
+function hlChoice(q, ua) {
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => { b.classList.remove('selected','correct','wrong'); b.onclick=null; });
+  btns.forEach((b,i) => {
+    if (i===q.ans) b.classList.add('correct');
+    else if (i===ua) b.classList.add('wrong');
+  });
+}
+
+function hlTF(q, ua) {
+  const btns = document.querySelectorAll('.tf-btn');
+  btns.forEach(b=>{b.className='tf-btn';b.onclick=null;});
+  if (q.ans) { btns[0].style.background='#e8f5e9'; btns[0].style.borderColor='#4caf50'; }
+  else { btns[1].style.background='#e8f5e9'; btns[1].style.borderColor='#4caf50'; }
+  if (ua!==q.ans) { const w = ua?btns[0]:btns[1]; w.style.background='#ffebee'; w.style.borderColor='#f44336'; }
+}
+
+function restoreAns(q) {
+  const ua = state.answers[q.id];
+  if (ua===undefined||ua===null) return;
+  if (q.type==='choice') hlChoice(q, ua);
+  else if (q.type==='truefalse') hlTF(q, ua);
+  else {
+    const ta = document.getElementById('inpAns');
+    if (ta) { ta.value = ua; ta.className = state.results[q.id]?'ok':'no'; }
+  }
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').textContent = state.results[q.id]?'✅ 正确':'❌ 错误';
+  document.getElementById('btnNext').classList.remove('hidden');
+  state.submitted = true;
+  const fb = document.getElementById('fb');
+  fb.style.display='block';
+  fb.className='feedback show '+(state.results[q.id]?'ok':'no');
+  fb.innerHTML = (state.results[q.id]?'✅ <b>正确！</b>':'❌ <b>错误！</b>')+getRightText(q)+'<div class="detail">💡 '+q.exp+'</div>';
+}
+
+// ==================== 图片 ====================
+function toggleImg() {
+  const w = document.getElementById('qImgWrap');
+  const b = document.querySelector('.img-toggle');
+  w.classList.toggle('hidden');
+  b.classList.toggle('open');
+  b.textContent = w.classList.contains('hidden')?'📷 查看原图':'📷 收起原图';
+}
+function toggleZoom(img) { img.classList.toggle('zoomed'); }
+
+// ==================== 统计 ====================
+function updateStats() {
+  const total = QUESTIONS.length;
+  const ans = state.answered.size;
+  document.getElementById('progBar').style.width = Math.round(ans/total*100)+'%';
+  document.getElementById('hCorr').textContent = state.answered.size - state.wrong.size;
+  document.getElementById('hWrong').textContent = state.wrong.size;
+  document.getElementById('hProg').textContent = ans+'/'+total;
+  document.getElementById('wrongBadge').textContent = state.wrong.size;
+}
+
+// ==================== 测验模式 ====================
+function startQuiz() {
+  // 重置测验状态
+  state.quizActive = true;
+  state.quizStart = Date.now();
+  state.quizElapsed = 0;
+  const filtered = getFiltered();
+  state.quizOrder = filtered.map(q => q.id);
+  state.quizIdx = 0;
+  state.curIdx = 0;
+
+  // 清空之前的答案（仅限测验范围内的题）
+  const oldAnswers = {...state.answers};
+  state.answers = {};
+  state.results = {};
+  state.answered = new Set();
+  state.wrong = new Set();
+
+  document.getElementById('panelPractice').classList.remove('hidden');
+  document.getElementById('quizBar').classList.remove('hidden');
+
+  // 启动计时器
+  if (state.quizTimer) clearInterval(state.quizTimer);
+  state.quizTimer = setInterval(() => {
+    state.quizElapsed = Math.floor((Date.now() - state.quizStart) / 1000);
+    const m = String(Math.floor(state.quizElapsed/60)).padStart(2,'0');
+    const s = String(state.quizElapsed%60).padStart(2,'0');
+    const el = document.getElementById('quizTimer');
+    el.textContent = m+':'+s;
+    if (state.quizElapsed > 600) el.classList.add('urgent');
+  }, 1000);
+
+  updateQuizProg();
+  renderQ();
+}
+
+function updateQuizProg() {
+  const total = state.quizOrder.length;
+  document.getElementById('quizProg').textContent = `${state.quizIdx+1}/${total}`;
+}
+
+function endQuiz() {
+  if (!state.quizActive) return;
+  state.quizActive = false;
+  if (state.quizTimer) clearInterval(state.quizTimer);
+
+  const total = state.quizOrder.length;
+  const correct = state.quizOrder.filter(id => state.results[id] === true).length;
+  const wrong = state.quizOrder.filter(id => state.results[id] === false).length;
+  const skipped = state.quizOrder.filter(id => !state.answered.has(id)).length;
+
+  document.getElementById('panelPractice').classList.add('hidden');
+  document.getElementById('quizBar').classList.add('hidden');
+  document.getElementById('resultPanel').classList.add('show');
+
+  document.getElementById('rScore').textContent = correct;
+  document.getElementById('rTotal').textContent = '/ '+total;
+
+  const pct = Math.round(correct/total*100);
+  let title, msg;
+  if (pct>=90) { title='🏆 太棒了！'; msg=`${total}题答对${correct}题，正确率${pct}%！`; }
+  else if (pct>=70) { title='👏 不错！'; msg=`${total}题答对${correct}题，继续巩固！`; }
+  else if (pct>=50) { title='💪 加油'; msg=`${total}题答对${correct}题，错题要重点复习！`; }
+  else { title='📚 需要多练'; msg=`${total}题答对${correct}题，建议重新刷一遍！`; }
+  if (skipped>0) msg += `（${skipped}题跳过）`;
+  document.getElementById('rTitle').textContent = title;
+  document.getElementById('rMsg').textContent = msg;
+
+  // 详细清单
+  const extra = document.getElementById('rExtra');
+  extra.innerHTML = `<h4 style="margin-bottom:8px;">📋 答题明细</h4>`;
+  state.quizOrder.forEach(id => {
+    const q = qById(id);
+    if (!q) return;
+    const r = state.results[id];
+    const icon = r===true?'✅':(r===false?'❌':'⏭️');
+    const cls = r===true?'qr-ok':(r===false?'qr-no':'');
+    extra.innerHTML += `<div class="qr-item ${cls}"><span class="qr-icon">${icon}</span><span class="qr-num">#${id}</span><span>${q.text.replace(/<[^>]+>/g,'').substring(0,40)}...</span></div>`;
+  });
+
+  updateStats();
+}
+
+// ==================== 阅读模式 ====================
+function renderReview() {
+  const container = document.getElementById('panelReview');
+  container.innerHTML = '';
+  const filtered = getFiltered();
+  filtered.forEach(q => {
+    const typeName = {choice:'选择题',truefalse:'判断题',fill:'填空题',code:'编程题',essay:'简答题'}[q.type];
+    let answerHtml;
+    if (q.type==='choice') {
+      const labels=['A','B','C','D'];
+      answerHtml = labels[q.ans] + '. ' + q.opts[q.ans];
+    } else if (q.type==='truefalse') {
+      answerHtml = q.ans ? '对' : '错';
+    } else {
+      answerHtml = q.ans[0];
+    }
+    container.innerHTML += `
+      <div class="review-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:4px;">
+          <span style="font-weight:700;color:#667eea;">#${q.id}</span>
+          <span style="font-size:11px;padding:1px 8px;border-radius:10px;background:#e8eaf6;color:#5c6bc0;font-weight:600;">${typeName}</span>
+        </div>
+        <div class="ri-q">${q.text.replace(/\n/g,'<br>')}</div>
+        <div class="ri-answer">✅ 答案：${answerHtml}</div>
+        <div class="ri-explain">💡 ${q.exp}</div>
+      </div>
+    `;
+  });
+}
+
+// ==================== 答题卡 ====================
+function renderNav() {
+  const grid = document.getElementById('navGrid');
+  grid.innerHTML = '';
+  QUESTIONS.forEach(q => {
+    const d = document.createElement('div');
+    d.className = 'nav-dot';
+    d.textContent = q.id;
+    if (state.answered.has(q.id)) {
+      d.classList.add(state.wrong.has(q.id)?'err':'done');
+    }
+    d.onclick = () => {
+      // 找到在筛选后列表中的位置
+      const filtered = getFiltered();
+      const idx = filtered.findIndex(x => x.id === q.id);
+      if (idx >= 0) {
+        state.curIdx = idx;
+        setMode('practice');
+      }
+    };
+    grid.appendChild(d);
+  });
+}
+
+// ==================== 重置 ====================
+function resetAll() {
+  if (state.quizTimer) clearInterval(state.quizTimer);
+  state.curIdx = 0;
+  state.answers = {};
+  state.results = {};
+  state.answered = new Set();
+  state.wrong = new Set();
+  state.submitted = false;
+  state.quizActive = false;
+  state.quizOrder = [];
+  state.quizIdx = 0;
+
+  document.getElementById('resultPanel').classList.remove('show');
+  setMode('practice');
+  updateStats();
+}
+
+// ==================== 初始化 ====================
+updateStats();
+renderQ();
+</script>
+</body>
+</html>
