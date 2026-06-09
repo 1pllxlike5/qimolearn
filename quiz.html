@@ -1364,6 +1364,7 @@ let state = {
 // ==================== localStorage 持久化 ====================
 function saveState() {
   try {
+    localStorage.setItem('qa_answers', JSON.stringify(state.answers));
     localStorage.setItem('qa_answered', JSON.stringify([...state.answered]));
     localStorage.setItem('qa_results', JSON.stringify(state.results));
     localStorage.setItem('qa_wrong', JSON.stringify([...state.wrong]));
@@ -1444,7 +1445,7 @@ function setFilter(f) {
     const el = document.querySelector(`.filter-chip[data-filter="${t}"]`);
     if (el) el.textContent = {choice:'选择题',truefalse:'判断题',fill:'填空题',code:'编程题'}[t] + ` (${count})`;
   });
-  if (state.mode === 'practice' || state.mode === 'review') { state.curIdx = 0; renderQ(); }
+  if (state.mode === 'practice' || state.mode === 'review' || state.mode === 'wrong') { state.curIdx = 0; renderQ(); }
 }
 
 // ==================== 渲染题目 ====================
@@ -1650,7 +1651,7 @@ function skipQ() {
 
 function nextQ() {
   const filtered = getFiltered();
-  if (state.mode === 'practice' && state.curIdx < filtered.length-1) {
+  if ((state.mode === 'practice' || state.mode === 'wrong') && state.curIdx < filtered.length-1) {
     state.curIdx++;
     renderQ();
   }
