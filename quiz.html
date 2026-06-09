@@ -1455,13 +1455,8 @@ function renderQ() {
   state.submitted = false;
   const filtered = getFiltered();
   if (filtered.length === 0 && state.mode === 'wrong') { document.getElementById('qNum').textContent = '🎉 错题已全部消灭！'; document.getElementById('qTypeLabel').textContent=''; document.getElementById('qText').innerHTML='太棒了！你已经把所有错题都做对了。<br>点击 <b>答题卡</b> 查看全部题目，或切换到 <b>刷题</b> 模式继续练习。'; hideAll(); return; }
-  // 折叠原图
-  
-  const imgBtn = document.querySelector('.img-toggle');
-  imgBtn.classList.remove('open'); imgBtn.textContent = '📷 查看原图';
 
   // 题号与类型
-  const filtered = getFiltered();
   const globalNum = q.id;
   const typeName = {choice:'选择题',truefalse:'判断题',fill:'填空题',code:'编程题',essay:'简答题'}[q.type];
   document.getElementById('qNum').textContent = `#${globalNum}  (${state.curIdx+1}/${filtered.length})`;
