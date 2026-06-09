@@ -1360,6 +1360,27 @@ let state = {
 };
 
 
+
+// ==================== localStorage 持久化 ====================
+function saveState() {
+  try {
+    localStorage.setItem('qa_answered', JSON.stringify([...state.answered]));
+    localStorage.setItem('qa_results', JSON.stringify(state.results));
+    localStorage.setItem('qa_wrong', JSON.stringify([...state.wrong]));
+    localStorage.setItem('qa_bookmarked', JSON.stringify([...state.bookmarked]));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    state.answers = JSON.parse(localStorage.getItem('qa_answers') || '{}');
+    JSON.parse(localStorage.getItem('qa_answered') || '[]').forEach(id => state.answered.add(id));
+    state.results = JSON.parse(localStorage.getItem('qa_results') || '{}');
+    JSON.parse(localStorage.getItem('qa_wrong') || '[]').forEach(id => state.wrong.add(id));
+    JSON.parse(localStorage.getItem('qa_bookmarked') || '[]').forEach(id => state.bookmarked.add(id));
+  } catch(e) {}
+}
+
 // ==================== 工具函数 ====================
 function getFiltered() {
   let qs = QUESTIONS;
